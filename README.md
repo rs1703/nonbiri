@@ -6,8 +6,6 @@ _The UI is inspired by [Tachiyomi](https://github.com/tachiyomiorg/tachiyomi)._
 
 ## Features
 
----
-
 - Online read and browse MangaDex
 - Offline read and download chapters
 - History tracker and scheduled updates
@@ -22,8 +20,6 @@ _More features and alternative manga sources will also be added in the future._
 
 ## Installation
 
----
-
 Pre-built binaries are available on [releases page](http://).
 
 ### Usage
@@ -31,8 +27,6 @@ Pre-built binaries are available on [releases page](http://).
 Run `nonbiri`, then open `localhost:<port>` on your web browser.
 
 ## Compiling
-
----
 
 Requirements:
 
@@ -74,8 +68,6 @@ _The output files will be inside the `bin` directory._
 
 ## Local network sharing
 
----
-
 Knowledge about networking is required.
 
 If you are running the back-end on linux, simply add the port which used by the back-end into the firewall. To do so, execute the following command:
@@ -98,12 +90,8 @@ inet 127.0.0.1  netmask 255.0.0.0
 
 ## License
 
----
-
 **Nonbiri** is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ## Disclaimer
-
----
 
 The developer of this application does not have any affiliation with the content providers available.
