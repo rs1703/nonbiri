@@ -24,7 +24,7 @@ func Updates(isCaching bool) (_ chapter.Slice, err error) {
 }
 
 func cacheUpdates() {
-	if len(uCache) == 0 {
+	if len(uCache) == 0 || updateState != nil {
 		return
 	}
 	uCache = chapter.Slice{}

@@ -117,7 +117,10 @@ export enum Task {
 
   UpdateBrowsePreference = 51,
   UpdateLibraryPreference,
-  UpdateReaderPreference
+  UpdateReaderPreference,
+
+  UpdateLibrary = 60,
+  GetUpdateLibraryState
 }
 
 export enum PageDirection {
