@@ -73,7 +73,7 @@ func UpdateLibrary() *UpdateState {
 				Body: updateState,
 			}
 
-			entry, err = UpdateManga(entry.ID)
+			entry, err = UpdateManga(entry.ID, true)
 			if err != nil {
 				logger.Unexpected(err)
 				continue
@@ -93,8 +93,8 @@ func GetUpdateLibraryState() *UpdateState {
 	return updateState
 }
 
-func cacheLibrary() {
-	if len(lCache) == 0 || updateState != nil {
+func cacheLibrary(isUpdating bool) {
+	if len(lCache) == 0 || isUpdating {
 		return
 	}
 	lCache = manga.Slice{}

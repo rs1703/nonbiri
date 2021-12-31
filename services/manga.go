@@ -22,7 +22,7 @@ func GetManga(id string) (*manga.Manga, error) {
 	return data, nil
 }
 
-func UpdateManga(id string) (_ *manga.Manga, err error) {
+func UpdateManga(id string, isUpdating bool) (_ *manga.Manga, err error) {
 	defer utils.Track("services.UpdateManga")()
 
 	data, err := manga.One(id, false)
@@ -52,7 +52,7 @@ func UpdateManga(id string) (_ *manga.Manga, err error) {
 		return
 	}
 
-	data.Chapters, err = UpdateChapters(data.ID)
+	data.Chapters, err = UpdateChapters(data.ID, isUpdating)
 	if err != nil {
 		return
 	}
@@ -84,8 +84,8 @@ func FollowManga(id string, followState FollowState) (_ *manga.Manga, err error)
 		return
 	}
 
-	cacheLibrary()
-	cacheUpdates()
+	cacheLibrary(false)
+	cacheUpdates(false)
 	return data, nil
 }
 
@@ -105,7 +105,7 @@ func UnfollowManga(id string) (_ *manga.Manga, err error) {
 		return
 	}
 
-	cacheLibrary()
-	cacheUpdates()
+	cacheLibrary(false)
+	cacheUpdates(false)
 	return data, nil
 }

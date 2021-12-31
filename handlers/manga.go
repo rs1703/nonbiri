@@ -11,7 +11,7 @@ func GetManga(message *websocket.IncomingMessage) (any, error) {
 }
 
 func UpdateManga(message *websocket.IncomingMessage) (any, error) {
-	return services.UpdateManga(message.Body.(string))
+	return services.UpdateManga(message.Body.(string), false)
 }
 
 func FollowManga(message *websocket.IncomingMessage) (any, error) {

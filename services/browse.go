@@ -98,7 +98,7 @@ func Browse(q BrowseQuery) (result *BrowseData, err error) {
 			return nil, err
 		}
 
-		cacheLibrary()
+		cacheLibrary(false)
 	}
 	return &BrowseData{Entries: data, Query: q, QueryResultInfo: info}, nil
 }

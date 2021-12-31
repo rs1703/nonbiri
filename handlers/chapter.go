@@ -18,5 +18,5 @@ func GetChapters(message *websocket.IncomingMessage) (any, error) {
 }
 
 func UpdateChapters(message *websocket.IncomingMessage) (any, error) {
-	return services.UpdateChapters(message.Body.(string))
+	return services.UpdateChapters(message.Body.(string), false)
 }
