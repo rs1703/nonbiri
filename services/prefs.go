@@ -26,6 +26,12 @@ func UpdateBrowsePref(new *prefs.BrowsePreference) (*prefs.BrowsePreference, err
 }
 
 func UpdateLibraryPref(new *prefs.LibraryPreference) (*prefs.LibraryPreference, error) {
+	updateSchedule := new.UpdateFrequency != prefs.Library.UpdateFrequency
+	defer func() {
+		if updateSchedule {
+			go ScheduleUpdate()
+		}
+	}()
 	prefs.Library.Update(new)
 	return prefs.Library, nil
 }

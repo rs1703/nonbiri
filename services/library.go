@@ -1,13 +1,17 @@
 package services
 
 import (
+	"sync"
+	"time"
+
 	. "nonbiri/constants"
 	. "nonbiri/database"
-	"sync"
 
 	"nonbiri/models/manga"
-	"nonbiri/utils"
 	"nonbiri/utils/logger"
+
+	"nonbiri/prefs"
+	"nonbiri/utils"
 	"nonbiri/websocket"
 )
 
@@ -19,7 +23,6 @@ type UpdateState struct {
 
 var lCache manga.Slice
 var updateState *UpdateState
-var lMutex = sync.Mutex{}
 
 func Library(isCaching bool) manga.Slice {
 	var track func()
@@ -38,13 +41,14 @@ func Library(isCaching bool) manga.Slice {
 }
 
 func UpdateLibrary() *UpdateState {
-	lMutex.Lock()
-	defer lMutex.Unlock()
-
 	if updateState != nil {
 		return updateState
 	}
+
 	updateState = &UpdateState{}
+
+	prefs.Library.LastUpdated = time.Now().Unix()
+	prefs.Library.Update(nil)
 
 	go func() {
 		var err error
@@ -84,6 +88,9 @@ func UpdateLibrary() *UpdateState {
 		websocket.Broadcast <- &websocket.OutgoingMessage{
 			Task: Tasks.GetUpdateLibraryState,
 		}
+
+		prefs.Library.LastUpdated = time.Now().Unix()
+		prefs.Library.Update(nil)
 	}()
 
 	return updateState
@@ -91,6 +98,45 @@ func UpdateLibrary() *UpdateState {
 
 func GetUpdateLibraryState() *UpdateState {
 	return updateState
+}
+
+var scheduler = struct {
+	Ticker *time.Ticker
+	Done   chan bool
+	sync.Mutex
+}{
+	Done: make(chan bool),
+}
+
+func ScheduleUpdate() {
+	scheduler.Lock()
+	defer scheduler.Unlock()
+
+	if scheduler.Ticker != nil {
+		scheduler.Done <- true
+	}
+
+	frequency := prefs.Library.UpdateFrequency * time.Hour
+	lastUpdated := time.Unix(prefs.Library.LastUpdated, 0)
+
+	if time.Now().After(lastUpdated.Add(frequency)) {
+		UpdateLibrary()
+	}
+
+	scheduler.Ticker = time.NewTicker(frequency)
+	go func() {
+		for {
+			select {
+			case <-scheduler.Done:
+				scheduler.Ticker.Stop()
+				return
+			case <-scheduler.Ticker.C:
+				if updateState != nil {
+					UpdateLibrary()
+				}
+			}
+		}
+	}()
 }
 
 func cacheLibrary(isUpdating bool) {

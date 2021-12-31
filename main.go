@@ -41,6 +41,7 @@ func main() {
 	services.Tags()
 	services.Library(true)
 	services.Updates(true)
+	go services.ScheduleUpdate()
 
 	StartServer()
 }
