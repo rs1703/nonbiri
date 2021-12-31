@@ -1,0 +1,117 @@
+@import "variables";
+
+.chapters {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading {
+  margin: 4rem auto;
+}
+
+.empty {
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  margin-bottom: 0.6rem;
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    flex: 1 0;
+  }
+}
+
+.actions {
+  font-size: 2.4rem;
+  display: flex;
+}
+
+.sort {
+  transition: @linear;
+  transition-property: transform;
+}
+
+.sort[data-active] {
+  transform: rotate3d(1, 0, 0, 180deg);
+}
+
+.update[data-active] {
+  animation: spin 1s linear infinite;
+  cursor: not-allowed;
+  color: fade(@global-text-color, 50%);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty,
+.list {
+  background-color: @primary-bg;
+  border-radius: 0.4rem;
+  position: relative;
+  overflow: hidden;
+
+  li {
+    transition: @linear;
+    transition-property: opacity;
+
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    height: 5.55rem;
+
+    &:nth-child(odd) {
+      background-color: @secondary-bg;
+    }
+
+    &[data-active] {
+      border-left: 0.4rem solid @global-text-color;
+    }
+
+    a {
+      transition: @linear;
+      transition-property: opacity;
+
+      flex: 1 0;
+      width: 0;
+      padding: 0.8rem 1.2rem;
+    }
+
+    button {
+      font-size: 2rem;
+      padding: 1.2rem;
+    }
+
+    &:not(:hover) button {
+      display: none;
+    }
+  }
+}
+
+.list li[data-readed] a,
+.progress {
+  opacity: 0.5;
+}
+
+.list .hidden {
+  opacity: 0;
+}
+
+.name,
+.info {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

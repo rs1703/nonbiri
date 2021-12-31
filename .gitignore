@@ -1,0 +1,15 @@
+bin
+build
+dist
+publish
+node_modules 
+downloads
+cache
+
+*.env 
+.env* 
+*.local
+*.db
+*.out
+*.log
+Test*.json

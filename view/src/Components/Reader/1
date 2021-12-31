@@ -1,0 +1,196 @@
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Helmet } from "react-helmet";
+import { useLocation, useRouteMatch } from "react-router";
+import AppContext from "../../AppContext";
+import { routes } from "../../Config";
+import "../../styles/Reader.less";
+import { formatChapter } from "../../utils/encoding";
+import { useMounted, useOnMount, useOnResize, useOnScroll } from "../../utils/hooks";
+import { GetChapters, GetManga, UpdateChapters, UpdateManga } from "../../websocket";
+import NotFound from "../NotFound";
+import Spinner from "../Spinner";
+import Main from "./Main";
+import ReaderContext from "./ReaderContext";
+import Sidebar from "./Sidebar";
+
+const findByGroups = (current: Chapter, target: Chapter, chapters: Chapter[]): Chapter => {
+  if (!current || !target || !chapters?.length) {
+    return undefined;
+  }
+
+  const filteredChapters = chapters.filter(chapter => chapter.chapter === target.chapter);
+  const result = filteredChapters.find(chapter => {
+    if (chapter.groups?.length === current.groups?.length) {
+      return current.groups?.every(a => chapter.groups?.some(b => a.id === b.id));
+    }
+    return current.groups?.some(a => chapter.groups?.some(b => a.id === b.id));
+  });
+
+  return result || target;
+};
+
+const Reader = () => {
+  const { mangaId, chapterId } = useRouteMatch<RouteContext>(`${routes.reader}/:mangaId/:chapterId`).params;
+  const { state } = useLocation<LocationContext>();
+
+  const {
+    library,
+    prefs: { reader: pref }
+  } = useContext(AppContext).context;
+
+  const data = useMemo<Manga>(
+    () => library?.find(m => m.id === mangaId) || state?.data,
+    [library, mangaId, state?.data]
+  );
+
+  const [chapter, prevChapter, nextChapter] = useMemo<Chapter[]>(() => {
+    if (!data?.chapters?.length) return [];
+
+    const idx = data.chapters.findIndex(c => c.id === chapterId);
+    const current = data.chapters[idx];
+    if (!current) return [];
+
+    let prev: Chapter;
+    for (let i = idx + 1; i < data.chapters.length; i++) {
+      const c = data.chapters[i];
+      if (c.chapter !== current.chapter) {
+        prev = findByGroups(current, c, data.chapters);
+        break;
+      }
+    }
+
+    let next: Chapter;
+    for (let i = idx - 1; i >= 0; i--) {
+      const c = data.chapters[i];
+      if (c.chapter !== current.chapter) {
+        next = findByGroups(current, c, data.chapters);
+        break;
+      }
+    }
+
+    return [current, prev, next];
+  }, [chapterId, data?.chapters]);
+
+  const [pages, setPages] = useState<PageState[]>([]);
+  const currentPage = useMemo(() => pages?.find(page => page.isViewing) || pages?.[0], [pages]);
+
+  const mountedRef = useMounted();
+  const [isLoading, setIsLoading] = useState<boolean>(!data || !chapter?.pages?.length || !pages);
+  const [isUpdating, setIsUpdating] = useState<boolean>();
+
+  useOnMount(() => {
+    (async () => {
+      if (!data) {
+        console.info("[Reader] Getting metadata...");
+        const { error } = await GetManga(mangaId);
+
+        if (!mountedRef.current) return;
+        if (!error) setIsLoading(false);
+      } else if (!data.chapters) {
+        console.info("[Reader] Getting chapters...");
+        const { error } = await GetChapters(mangaId);
+
+        if (!mountedRef.current) return;
+        if (!error) setIsLoading(false);
+      } else if (chapter?.pages?.length) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsUpdating(true);
+
+      console.info("[Reader] Retrieving latest metadata and chapters...");
+      const { error } = await (!data ? UpdateManga(mangaId) : UpdateChapters(mangaId));
+
+      if (!mountedRef.current) return;
+      if (error) console.error(error);
+
+      setIsLoading(false);
+      setIsUpdating(false);
+    })();
+  });
+
+  useEffect(() => {
+    const p = (chapter?.pages || []).map((_, i) => ({ num: i + 1, isViewing: i + 1 === 1 }));
+    setPages(p);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterId]);
+
+  /**
+   * Main functionality to maintain relative scroll position
+   * when resizing window and changing page direction
+   */
+
+  const scrollOffsetRef = useRef(0);
+
+  const restoreScrollPos = useCallback(() => {
+    if (!currentPage?.ref?.current) return;
+    if (scrollOffsetRef.current > 0) {
+      currentPage.ref.current.scrollIntoView();
+    } else {
+      const pos = currentPage.ref.current.getBoundingClientRect().top - document.body.getBoundingClientRect().top;
+      window.scrollTo({ top: pos - scrollOffsetRef.current });
+    }
+  }, [currentPage?.ref]);
+
+  useOnScroll(() => {
+    if (!currentPage?.ref?.current) return;
+    scrollOffsetRef.current = currentPage.ref.current.getBoundingClientRect().top;
+  });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(restoreScrollPos, [pref.direction, pref.showSidebar]);
+  useOnResize(restoreScrollPos);
+
+  return (
+    <ReaderContext.Provider
+      value={useMemo(
+        () => ({
+          mountedRef,
+          isLoading,
+          isUpdating,
+
+          data,
+          chapter,
+          prevChapter,
+          nextChapter,
+
+          pages,
+          currentPage,
+          scrollOffsetRef,
+
+          setIsLoading,
+          setIsUpdating,
+          setPages
+        }),
+        [chapter, currentPage, data, isLoading, isUpdating, mountedRef, nextChapter, pages, prevChapter]
+      )}
+    >
+      {data && chapter && (
+        <Helmet>
+          <title>
+            {formatChapter(chapter)} - {data.title} - Nonbiri
+          </title>
+        </Helmet>
+      )}
+
+      {data ? (
+        <>
+          <Sidebar />
+          <Main key={chapterId} />
+        </>
+      ) : (
+        (() =>
+          isLoading ? (
+            <Spinner styleName="loading" />
+          ) : (
+            <NotFound>
+              <p>Manga does not exists</p>
+            </NotFound>
+          ))()
+      )}
+    </ReaderContext.Provider>
+  );
+};
+
+export default Reader;

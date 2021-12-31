@@ -1,0 +1,172 @@
+@import "variables";
+
+.library,
+.browse {
+  position: relative;
+  max-width: @global-max-width;
+  min-height: calc(100vh - @header-height);
+  margin: auto;
+  padding: 0 1rem 1rem;
+}
+
+.library > .loading,
+.browse > .loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.notFound a:hover {
+  text-decoration: underline;
+}
+
+.browse .paginating {
+  z-index: 100;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 4.8rem;
+  height: 4.8rem;
+  margin: 2rem;
+}
+
+.browseContent,
+.libraryContent {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-gap: 1rem;
+
+  @media (max-width: 1770px) {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  @media (max-width: 1580px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  @media (max-width: 1150px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 770px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 580px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.entry {
+  transition: @linear;
+
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.75);
+  background-color: @primary-bg;
+  border-radius: 0.4rem;
+  position: relative;
+  overflow: hidden;
+
+  height: 0;
+  padding-bottom: calc(363 / 256 * 100%);
+
+  a {
+    transition: @linear;
+    display: block;
+  }
+}
+
+.entry.hidden a {
+  opacity: 0;
+}
+
+.metadata {
+  transition: @linear;
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5) 100%);
+  color: #fff;
+
+  font-family: @secondary-font;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.entry[data-unfollowed] .metadata,
+.entry[data-followed] .metadata {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.top,
+.bottom {
+  padding: 1rem;
+}
+
+.top {
+  flex: 1 0;
+}
+
+.unreadedChapters,
+.followState {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.unreadedChapters {
+  border-radius: 0.4rem;
+  text-transform: uppercase;
+  line-height: 2.5rem;
+
+  display: inline-block;
+  height: $line-height - (0.1rem);
+  padding: 0 0.6rem;
+}
+
+.followState {
+  border-radius: 100%;
+  font-size: 2.8rem;
+
+  position: relative;
+  float: right;
+  padding: 0.6rem;
+  width: $font-size + $padding;
+  height: $font-size + $padding;
+
+  &:not([data-updating]) {
+    opacity: 0;
+  }
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.followState svg,
+.followState .loading {
+  width: 100%;
+  height: 100%;
+}
+
+.entry:hover .followState {
+  opacity: 1;
+}
+
+.title {
+  text-shadow: 0 0 0.25rem rgba(0, 0, 0, 1), 0 0 0.25rem rgba(0, 0, 0, 0.5);
+  color: #fff;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

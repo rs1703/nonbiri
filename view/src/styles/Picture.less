@@ -1,0 +1,41 @@
+@import "variables";
+
+.picture [data-loading] {
+  opacity: 0;
+}
+
+.img {
+  transition: @linear;
+}
+
+div.img,
+.error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+div.img {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.error {
+  pointer-events: none;
+  user-select: none;
+
+  text-align: center;
+  text-transform: uppercase;
+  height: 9rem;
+  padding: 1rem;
+}
+
+.error svg {
+  font-size: 4.8rem;
+  display: block;
+  width: 100%;
+}

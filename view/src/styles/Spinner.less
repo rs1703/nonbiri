@@ -1,0 +1,47 @@
+.loading {
+  position: relative;
+  width: 12rem;
+  height: 12rem;
+  margin: auto;
+}
+
+.spinner {
+  animation: 2s linear 0s infinite normal none running ls;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  circle {
+    stroke: inherit;
+    fill: transparent;
+    stroke-width: inherit;
+    stroke-dashoffset: 600;
+    stroke-dasharray: 300;
+    stroke-miterlimit: 10;
+    animation: lp 1.6s cubic-bezier(0.4, 0.15, 0.6, 0.85) infinite;
+  }
+}
+
+@keyframes ls {
+  0% {
+    transform: rotate(0);
+    -webkit-transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes lp {
+  0% {
+    stroke-dashoffset: 600;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
