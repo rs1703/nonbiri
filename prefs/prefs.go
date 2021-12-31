@@ -27,15 +27,20 @@ func init() {
 		logger.UnexpectedFatal(err)
 	}
 
+	mutex.Lock()
 	utils.Unmarshal(viper.Get("browse"), Browse)
 	utils.Unmarshal(viper.Get("library"), Library)
 	utils.Unmarshal(viper.Get("reader"), Reader)
-	viper.SetDefault("auth", Auth)
+	utils.Unmarshal(viper.Get("auth"), Auth)
+	mutex.Unlock()
 
 	viper.OnConfigChange(func(fsnotify.Event) {
+		mutex.Lock()
 		utils.Unmarshal(viper.Get("browse"), Browse)
 		utils.Unmarshal(viper.Get("library"), Library)
 		utils.Unmarshal(viper.Get("reader"), Reader)
+		utils.Unmarshal(viper.Get("auth"), Auth)
+		mutex.Unlock()
 	})
 	viper.WatchConfig()
 }
