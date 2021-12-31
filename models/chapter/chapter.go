@@ -77,7 +77,6 @@ func All(limit uint16) (result Slice, err error) {
 				LEFT JOIN history ON history.chapterId = chapter.id
 				WHERE n <= 3 AND manga.followed = true ORDER BY chapter.publishAt DESC
 				LIMIT ?`
-
 	if err = DB.Select(&result, q, limit); err != nil {
 		logger.Unexpected(err)
 	}
