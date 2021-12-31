@@ -51,8 +51,8 @@ func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
 		return
 	}
 
-	cacheLibrary()
-	cacheUpdates()
+	cacheLibrary(false)
+	cacheUpdates(false)
 	return data, nil
 }
 
@@ -61,7 +61,7 @@ func GetChapters(mangaId string) ([]*chapter.Chapter, error) {
 	return chapter.ByManga(mangaId), nil
 }
 
-func UpdateChapters(mangaId string) (_ []*chapter.Chapter, err error) {
+func UpdateChapters(mangaId string, isUpdating bool) (_ []*chapter.Chapter, err error) {
 	defer utils.Track("services.UpdateChapters")()
 
 	chapters := chapter.ByManga(mangaId)
@@ -96,7 +96,7 @@ func UpdateChapters(mangaId string) (_ []*chapter.Chapter, err error) {
 		return
 	}
 
-	cacheLibrary()
-	cacheUpdates()
+	cacheLibrary(isUpdating)
+	cacheUpdates(isUpdating)
 	return chapters, nil
 }

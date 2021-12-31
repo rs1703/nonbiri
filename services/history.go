@@ -65,7 +65,7 @@ func setReadState(state bool, ids ...string) (_ history.Slice, err error) {
 		}
 	}
 
-	cacheLibrary()
+	cacheLibrary(false)
 	return histories, nil
 }
 
