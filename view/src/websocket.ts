@@ -162,6 +162,12 @@ export const UpdateReaderPreference = (data: ReaderPreference) =>
 
 //
 
+export const UpdateLibrary = () => SendMessage<LibraryUpdateState>(Task.UpdateLibrary);
+
+export const GetUpdateLibraryState = () => SendMessage<LibraryUpdateState>(Task.GetUpdateLibraryState);
+
+//
+
 export default {
   Init,
   Handle

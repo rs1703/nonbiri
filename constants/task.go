@@ -31,6 +31,9 @@ var Tasks = struct {
 	UpdateBrowsePreference,
 	UpdateLibraryPreference,
 	UpdateReaderPreference Task
+
+	UpdateLibrary,
+	GetUpdateLibraryState Task
 }{
 	// Send and receive tasks
 	GetManga:      1,
@@ -61,4 +64,7 @@ var Tasks = struct {
 	UpdateBrowsePreference:  51,
 	UpdateLibraryPreference: 52,
 	UpdateReaderPreference:  53,
+
+	UpdateLibrary:         60,
+	GetUpdateLibraryState: 61,
 }

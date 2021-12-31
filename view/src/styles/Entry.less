@@ -32,6 +32,56 @@
   margin: 2rem;
 }
 
+.update[data-active] {
+  animation: spin 1s linear infinite;
+  cursor: not-allowed;
+  color: fade(@global-text-color, 50%);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.updateState {
+  background-color: @primary-bg;
+  border-radius: 0.4rem;
+
+  position: relative;
+  overflow: hidden;
+
+  @height: 3.2rem;
+  height: @height;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+
+  strong {
+    line-height: @height;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    position: relative;
+    display: block;
+    z-index: 1;
+
+    margin-bottom: 0.4rem;
+  }
+
+  div {
+    background-color: @secondary-bg;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+  }
+}
+
 .browseContent,
 .libraryContent {
   position: relative;

@@ -1,14 +1,15 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet";
+import { IoMdRefresh } from "react-icons/io";
 import AppContext from "../AppContext";
 import Config from "../Config";
-import { Order, Sort } from "../constants";
+import { Order, Sort, Task } from "../constants";
 import "../styles/Entry.less";
 import utils from "../utils";
 import { formatQuery, parseQuery } from "../utils/encoding";
 import { useMounted, useMutableHistory } from "../utils/hooks";
 import { isQueryEmpty } from "../utils/validator";
-import { UpdateLibraryPreference } from "../websocket";
+import websocket, { GetUpdateLibraryState, UpdateLibrary, UpdateLibraryPreference } from "../websocket";
 import Anchor from "./Anchor";
 import Entry from "./Entry";
 import Header from "./Header";
@@ -104,6 +105,9 @@ const Library = () => {
   const mountedRef = useMounted();
   const ref = useRef<HTMLDivElement>();
 
+  const [isUpdating, setIsUpdating] = useState<boolean>();
+  const [updateState, setUpdateState] = useState<LibraryUpdateState>();
+
   const [query, setQuery] = useState<BrowseQuery>(() =>
     historyRef.current.location.search ? parseQuery(historyRef.current.location.search) : {}
   );
@@ -129,6 +133,29 @@ const Library = () => {
     },
     [context.prefs.library]
   );
+
+  const updateLibrary = useCallback(async () => {
+    if (isUpdating) return;
+    UpdateLibrary();
+  }, [isUpdating]);
+
+  useEffect(() => {
+    const pushUpdateState = ({ body }: IncomingMessage<LibraryUpdateState>) => {
+      setUpdateState(body);
+      setIsUpdating(!!body);
+    };
+
+    const removers = [
+      websocket.Handle(Task.UpdateLibrary, pushUpdateState),
+      websocket.Handle(Task.GetUpdateLibraryState, pushUpdateState)
+    ];
+
+    GetUpdateLibraryState();
+
+    return () => {
+      removers.forEach(remove => remove());
+    };
+  }, []);
 
   /**
    * Update URLSearchParams when BrowseQuery has been changed.
@@ -195,14 +222,34 @@ const Library = () => {
       <Header
         searchProps={{ query, setQuery }}
         sorterProps={{ options: sortOptions, sort, order, callback: updateSortState }}
-      />
+      >
+        <button
+          styleName="update"
+          data-active={isUpdating || undefined}
+          type="button"
+          title="Check for updates"
+          onClick={updateLibrary}
+        >
+          <IoMdRefresh />
+        </button>
+      </Header>
       <div styleName="library">
         {data?.length ? (
-          <div styleName="libraryContent" ref={ref}>
-            {data.slice(0, Config.library.limit * page).map(v => (
-              <Entry manga={v} key={v.id} />
-            ))}
-          </div>
+          <>
+            {updateState && updateState.current && (
+              <div styleName="updateState">
+                <strong>
+                  Updating ({updateState.progress}/{updateState.total}): {updateState.current}
+                </strong>
+                <div style={{ width: `calc(${updateState.progress}/${updateState.total} * 100%)` }} />
+              </div>
+            )}
+            <div styleName="libraryContent" ref={ref}>
+              {data.slice(0, Config.library.limit * page).map(v => (
+                <Entry manga={v} key={v.id} />
+              ))}
+            </div>
+          </>
         ) : (
           (() =>
             query && context.library?.length ? (

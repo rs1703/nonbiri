@@ -44,4 +44,7 @@ func init() {
 	websocket.Handle(Tasks.UpdateBrowsePreference, UpdateBrowsePreference)
 	websocket.Handle(Tasks.UpdateLibraryPreference, UpdateLibraryPreference)
 	websocket.Handle(Tasks.UpdateReaderPreference, UpdateReaderPreference)
+
+	websocket.Handle(Tasks.UpdateLibrary, UpdateLibrary)
+	websocket.Handle(Tasks.GetUpdateLibraryState, GetUpdateLibraryState)
 }
