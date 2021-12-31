@@ -140,7 +140,7 @@ const Library = () => {
 
   useEffect(() => {
     const pushUpdateState = ({ body }: IncomingMessage<LibraryUpdateState>) => {
-      setIsUpdating(!!body);
+      setIsUpdating(!!body?.total);
     };
 
     const removers = [
