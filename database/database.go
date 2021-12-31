@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	_ "embed"
-	"strings"
 	"sync"
 
 	"nonbiri/utils/logger"
@@ -13,15 +12,10 @@ import (
 )
 
 var DB *sqlx.DB
-
 var once = sync.Once{}
 
 //go:embed schema.sql
 var schema []byte
-
-func init() {
-	Init()
-}
 
 func Init() {
 	once.Do(func() {
@@ -34,15 +28,7 @@ func Init() {
 		if err := DB.Ping(); err != nil {
 			logger.UnexpectedFatal(err)
 		}
-
-		var count int
-		if err := DB.Get(&count, "SELECT count(id) FROM manga"); err != nil {
-			if strings.Contains(err.Error(), "no such table") {
-				DB.MustExec(string(schema))
-			} else {
-				logger.UnexpectedFatal(err)
-			}
-		}
+		DB.MustExec(string(schema))
 	})
 }
 
