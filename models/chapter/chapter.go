@@ -26,8 +26,6 @@ type Chapter struct {
 
 	MangaTitle string `json:"mangaTitle,omitempty" db:"mangaTitle"`
 	Cover      string `json:"cover,omitempty"`
-
-	N uint16 `json:"-" db:"n"`
 }
 
 type Metadata struct {
