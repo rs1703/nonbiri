@@ -26,8 +26,7 @@ type (
 		MaxParallel int `json:"maxParallel"`
 
 		// Shortcuts
-		Keybinds       Keybinds `json:"keybinds"`
-		KeyScrollSpeed string   `json:"keyScrollSpeed"`
+		Keybinds Keybinds `json:"keybinds"`
 	}
 
 	Keybinds struct {
@@ -59,7 +58,6 @@ var Reader = &ReaderPreference{
 		PreviousPage:    "ArrowLeft",
 		NextPage:        "ArrowRight",
 	},
-	KeyScrollSpeed: "40",
 }
 
 func (*ReaderPreference) Update(new *ReaderPreference) {
