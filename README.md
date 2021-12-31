@@ -34,6 +34,7 @@ Run `nonbiri`, then open `localhost:42071` on your web browser.
 Requirements:
 
 - Go 1.18+
+- GCC
 - Node.js
 - Yarn
 
