@@ -12,6 +12,7 @@ import Header from "./Header";
 import NotFound from "./NotFound";
 import Picture from "./Picture";
 import Spinner from "./Spinner";
+import UpdateProgress from "./UpdateProgress";
 
 interface UpdateEntry {
   id: string;
@@ -226,12 +227,15 @@ const Updates = () => {
         ) : (
           (() =>
             feed?.length ? (
-              <div styleName="updatesContent" ref={ref}>
-                {feed.map((e, i) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Entry data={e} key={`${e.id}-${i}`} />
-                ))}
-              </div>
+              <>
+                <UpdateProgress />
+                <div styleName="updatesContent" ref={ref}>
+                  {feed.map((e, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Entry data={e} key={`${e.id}-${i}`} />
+                  ))}
+                </div>
+              </>
             ) : (
               <NotFound title="No updates">
                 <p>There are no updates</p>
