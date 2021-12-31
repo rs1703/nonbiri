@@ -100,7 +100,7 @@ const Handle = <T>(task: Task, handler: TaskHandler<T>): RemoveHandler => {
 
 export const GetManga = (mangaId: string) => SendMessage<Manga>(Task.GetManga, mangaId);
 
-export const UpdateManga = (mangaId: string) => SendMessage<Manga>(Task.UpdateManga, { mangaId });
+export const UpdateManga = (mangaId: string) => SendMessage<Manga>(Task.UpdateManga, mangaId);
 
 export const FollowManga = (mangaId: string, followState: FollowState) =>
   SendMessage<Manga>(Task.FollowManga, { mangaId, followState });
@@ -109,13 +109,13 @@ export const UnfollowManga = (mangaId: string) => SendMessage<Manga>(Task.Unfoll
 
 //
 
-export const GetChapter = (chapterId: string) => SendMessage<Chapter>(Task.GetChapter, { chapterId });
+export const GetChapter = (chapterId: string) => SendMessage<Chapter>(Task.GetChapter, chapterId);
 
-export const UpdateChapter = (chapterId: string) => SendMessage<Chapter>(Task.UpdateChapter, { chapterId });
+export const UpdateChapter = (chapterId: string) => SendMessage<Chapter>(Task.UpdateChapter, chapterId);
 
 export const GetChapters = (mangaId: string) => SendMessage<Chapter[]>(Task.GetChapters, mangaId);
 
-export const UpdateChapters = (mangaId: string) => SendMessage<Chapter[]>(Task.UpdateChapters, { mangaId });
+export const UpdateChapters = (mangaId: string) => SendMessage<Chapter[]>(Task.UpdateChapters, mangaId);
 
 //
 

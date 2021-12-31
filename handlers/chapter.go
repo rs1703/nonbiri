@@ -2,24 +2,15 @@ package handlers
 
 import (
 	"nonbiri/services"
-	"nonbiri/utils"
 	"nonbiri/websocket"
 )
 
 func GetChapter(message *websocket.IncomingMessage) (any, error) {
-	body := &H{}
-	if err := utils.Unmarshal(message.Body, body); err != nil {
-		return nil, err
-	}
-	return services.GetChapter(body.ChapterId)
+	return services.GetChapter(message.Body.(string))
 }
 
 func UpdateChapter(message *websocket.IncomingMessage) (any, error) {
-	body := &H{}
-	if err := utils.Unmarshal(message.Body, body); err != nil {
-		return nil, err
-	}
-	return services.UpdateChapter(body.ChapterId)
+	return services.UpdateChapter(message.Body.(string))
 }
 
 func GetChapters(message *websocket.IncomingMessage) (any, error) {
@@ -27,9 +18,5 @@ func GetChapters(message *websocket.IncomingMessage) (any, error) {
 }
 
 func UpdateChapters(message *websocket.IncomingMessage) (any, error) {
-	body := &H{}
-	if err := utils.Unmarshal(message.Body, body); err != nil {
-		return nil, err
-	}
-	return services.UpdateChapters(body.MangaId)
+	return services.UpdateChapters(message.Body.(string))
 }
