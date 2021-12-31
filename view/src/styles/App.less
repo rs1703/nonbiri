@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@500;600;700&family=Roboto:wght@400;500&display=swap");
+
+@import "reset";
+@import "variables";
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(48, 48, 48);
+  &:hover {
+    background-color: rgb(80, 80, 80);
+  }
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  background-color: @global-bg;
+  color: @global-text-color;
+
+  font-family: @global-font;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+svg {
+  vertical-align: top;
+
+  &:not(:first-child),
+  &:not(:last-child) {
+    margin-top: 0.2rem;
+  }
+
+  &:first-child:not(:last-child) {
+    margin-right: 0.2rem;
+  }
+
+  &:last-child:not(:first-child) {
+    margin-left: 0.2rem;
+  }
+
+  &:first-child:last-child {
+    display: block;
+    margin: auto;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong {
+  font-weight: 500;
+  color: @global-text-strong-color;
+  margin: 0;
+}
+
+a,
+button {
+  &:hover {
+    color: @global-text-strong-color;
+  }
+}

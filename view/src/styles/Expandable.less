@@ -1,0 +1,66 @@
+@import "variables";
+
+.expandable {
+  transition: @linear;
+  position: relative;
+  overflow: hidden;
+}
+
+.expand,
+.shadow {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shadow {
+  opacity: 0;
+  transition: @linear;
+  background-image: linear-gradient(
+    180deg,
+    fade(@global-bg, 0%) 0%,
+    fade(@global-bg, 40%) 51.35%,
+    fade(@global-bg, 92%) 75%,
+    @global-bg 100%
+  );
+}
+
+.expandable[data-hidden] .shadow {
+  opacity: 1;
+}
+
+.expand button {
+  transition: @linear;
+  transition-property: background;
+  pointer-events: initial;
+
+  background-color: @global-bg;
+  color: fade(@global-text-color, 40%);
+  font-size: 1.9rem;
+
+  z-index: 10;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  display: flex;
+  width: 100%;
+
+  &:hover {
+    color: fade(@global-text-color, 75%);
+  }
+
+  &:before {
+    content: "";
+    border-top: 0.2rem dashed;
+    flex: 1 0;
+    margin: auto;
+  }
+}
+
+.expandable[data-hidden] .expand button {
+  background-color: transparent;
+}

@@ -1,0 +1,190 @@
+import marked from "marked";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Helmet } from "react-helmet";
+import { useHistory, useLocation, useRouteMatch } from "react-router";
+import AppContext from "../../AppContext";
+import { routes } from "../../Config";
+import { Task } from "../../constants";
+import "../../styles/Manga.less";
+import { formatCoverURL } from "../../utils/encoding";
+import { useMounted } from "../../utils/hooks";
+import Sync from "../../utils/Sync";
+import websocket, { GetChapters, GetManga, UpdateManga } from "../../websocket";
+import Anchor from "../Anchor";
+import Chapters from "../Chapters";
+import Expandable from "../Expandable";
+import Header from "../Header";
+import NotFound from "../NotFound";
+import Picture from "../Picture";
+import Spinner from "../Spinner";
+import MangaContext from "./MangaContext";
+import Sidebar from "./Sidebar";
+
+const MangaComponent = ({ id }: { id: string }) => {
+  const history = useHistory();
+  const { state } = useLocation<LocationContext>();
+
+  const { context, setContext } = useContext(AppContext);
+
+  const mountedRef = useMounted();
+  const ref = useRef<HTMLDivElement>();
+
+  const data = useMemo<Manga>(
+    () => context.library?.find(m => m.id === id) || state?.data,
+    [context.library, id, state?.data]
+  );
+
+  const [isLoading, setIsLoading] = useState<boolean>(!data?.chapters?.length);
+  const [isUpdating, setIsUpdating] = useState<boolean>();
+
+  const description = useMemo(() => (data?.description ? marked(data.description) : undefined), [data?.description]);
+  const coverURL = useMemo(() => formatCoverURL(data), [data]);
+
+  useEffect(() => {
+    (async () => {
+      if (!data) {
+        console.info("[Manga] Getting metadata...");
+        const { error } = await GetManga(id);
+        if (!mountedRef.current) return;
+        if (!error) setIsLoading(false);
+      } else if (!data.chapters) {
+        console.info("[Manga] Getting chapters...");
+        const { error } = await GetChapters(id);
+        if (!mountedRef.current) return;
+        if (!error) setIsLoading(false);
+      }
+
+      setIsUpdating(true);
+
+      console.info("[Manga] Retrieving latest metadata and chapters...");
+      const { error } = await UpdateManga(id);
+      if (!mountedRef.current) return;
+      if (error) console.error(error);
+
+      setIsUpdating(false);
+      setIsLoading(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    const syncData = ({ body }: IncomingMessage<Manga>) => {
+      if (body?.id === id) {
+        console.info("[Manga] Syncing data | %s | %s", body.title, body.id);
+        history.replace({ state: { ...state, data: Sync.Data(data, body) } });
+      }
+    };
+
+    const syncChapters = ({ body }: IncomingMessage<Chapter[]>) => {
+      if (body) {
+        console.info("[Manga] Syncing chapters...");
+        setContext(prevState => {
+          const library = Array.from(prevState.library || []);
+          const idx = library.findIndex(m => m.id === id);
+          if (idx >= 0) {
+            library[idx].chapters = Sync.Chapters(library[idx].chapters, body);
+            history.replace({ state: { ...state, data: library[idx] } });
+          } else {
+            history.replace({ state: { ...state, data: { ...data, chapters: Sync.Chapters(data.chapters, body) } } });
+          }
+          return { ...prevState, library };
+        });
+      }
+    };
+
+    const removeHandlers = [
+      websocket.Handle(Task.GetManga, syncData),
+      websocket.Handle(Task.UpdateManga, syncData),
+      websocket.Handle(Task.FollowManga, syncData),
+      websocket.Handle(Task.UnfollowManga, syncData),
+
+      websocket.Handle(Task.GetChapters, syncChapters),
+      websocket.Handle(Task.UpdateChapters, syncChapters)
+    ];
+
+    return () => {
+      removeHandlers.forEach(remove => remove());
+    };
+  }, [data, history, id, setContext, state]);
+
+  return (
+    <MangaContext.Provider
+      value={useMemo(
+        () => ({ mountedRef, isLoading, isUpdating, data, setIsLoading, setIsUpdating }),
+        [data, isLoading, isUpdating, mountedRef]
+      )}
+    >
+      {data?.title && (
+        <Helmet>
+          <title>{data.title} - Nonbiri</title>
+        </Helmet>
+      )}
+
+      <Header />
+
+      <div styleName="manga" ref={ref}>
+        {isLoading && !data && <Spinner styleName="loading" />}
+        <If condition={!isLoading || (isLoading && !!data)}>
+          {/* TODO: FIX */}
+          {!data && (
+            <NotFound styleName="notFound">
+              <p>Manga does not exists</p>
+            </NotFound>
+          )}
+          <If condition={!!data}>
+            <div styleName="banner">
+              {(data.banner?.length || 0) > 1 ? (
+                <Picture styleName="img" src={data.banner} div />
+              ) : (
+                <If condition={!isLoading || !!data.banner}>
+                  <Picture styleName="img" src={coverURL} div />
+                  <div styleName="blur" />
+                </If>
+              )}
+              <div styleName="shadow" />
+            </div>
+
+            <div styleName="content">
+              <Sidebar />
+              <div styleName="main">
+                <h1 styleName="title">{data.title}</h1>
+                <Expandable>
+                  {description ? (
+                    <div styleName="description" dangerouslySetInnerHTML={{ __html: description }} />
+                  ) : (
+                    <div styleName="description">
+                      <p>No description</p>
+                    </div>
+                  )}
+                </Expandable>
+
+                {data.relateds?.length && (
+                  <div styleName="relateds">
+                    <h2>Related Manga</h2>
+                    <Expandable>
+                      <ul>
+                        {data.relateds.map(related => (
+                          <li key={related.id}>
+                            <Anchor to={`${routes.manga}/${related.id}`}>{related.title}</Anchor>
+                          </li>
+                        ))}
+                      </ul>
+                    </Expandable>
+                  </div>
+                )}
+                <Chapters context={MangaContext} />
+              </div>
+            </div>
+          </If>
+        </If>
+      </div>
+    </MangaContext.Provider>
+  );
+};
+
+const Manga = () => {
+  const { id } = useRouteMatch<{ id: string }>(`${routes.manga}/:id`).params;
+  return <MangaComponent id={id} key={id} />;
+};
+
+export default Manga;

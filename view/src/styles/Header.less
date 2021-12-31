@@ -1,0 +1,173 @@
+@import "variables";
+
+.header {
+  z-index: 10;
+  background-color: @global-bg;
+  height: @header-height;
+}
+
+.headerContent,
+.navigation,
+.actions {
+  display: flex;
+}
+
+.headerContent,
+.navigation,
+.actions {
+  gap: 1rem;
+}
+
+.headerContent {
+  position: relative;
+  max-width: @global-max-width;
+  margin: auto;
+  padding: 1rem;
+}
+
+.navigation li a {
+  font-family: @secondary-font;
+  font-size: 2.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  line-height: 3.8rem;
+  display: block;
+}
+
+.search {
+  background-color: @search-bg;
+  border-radius: 0.4rem;
+  display: flex;
+  flex: 1 0;
+
+  input {
+    flex: 1 0;
+    padding: 1rem;
+  }
+}
+
+.search > button,
+.search > div > button,
+.actions > button,
+.actions > div > button {
+  font-size: 2.4rem;
+  line-height: $font-size;
+  display: block;
+  height: 100%;
+  padding: 0 0.8rem;
+}
+
+.pop {
+  box-shadow: 0 0 0.25rem rgb(0, 0, 0), 0 0 0.25rem rgba(0, 0, 0, 0.5);
+  background-color: @global-bg;
+  border-radius: 0 0 0.4rem 0.4rem;
+
+  z-index: 100;
+  position: absolute;
+  overflow: auto;
+  right: 0;
+
+  max-height: calc(100vh - @header-height * 2);
+  margin: auto;
+  padding: 1rem;
+
+  strong {
+    font-weight: 600;
+    text-transform: uppercase;
+    display: block;
+  }
+}
+
+.filter .pop {
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-row-gap: 1rem;
+  max-width: @filter-max-width;
+}
+
+.filter .section {
+  input {
+    display: none;
+  }
+
+  strong,
+  input[type="checkbox"] + span {
+    padding: 0.4rem;
+  }
+
+  input[type="checkbox"] + span {
+    display: inline-block;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  input[type="checkbox"]:checked + span {
+    color: rgb(0, 180, 40);
+  }
+
+  input[type="checkbox"][name^="excluded"]:checked + span {
+    color: rgb(255, 106, 106);
+  }
+}
+
+.filter .section:last-child {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.filter .section:last-child .sectionContent {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+
+  @media (max-width: 1280px) {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  @media (max-width: 1120px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.sort .pop {
+  @icon-size: 1.8rem;
+  @gap: 0.4rem;
+  @pad: 0.4rem;
+
+  strong {
+    margin-left: @icon-size + @gap;
+    padding: @pad;
+  }
+
+  button {
+    white-space: nowrap;
+
+    display: flex;
+    gap: @gap;
+
+    width: 100%;
+    padding: @pad;
+
+    > *:first-child {
+      font-size: @icon-size;
+      width: @icon-size;
+      height: @icon-size;
+      margin: 0;
+    }
+  }
+}

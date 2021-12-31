@@ -1,0 +1,166 @@
+import React, { useMemo, useState } from "react";
+import { render } from "react-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import AppContext from "./AppContext";
+import Browse from "./Components/Browse";
+import Library from "./Components/Library";
+import Manga from "./Components/Manga";
+import Reader from "./Components/Reader";
+import { routes } from "./Config";
+import { Task } from "./constants";
+import "./styles/App.less";
+import { useOnMount } from "./utils/hooks";
+import Sync from "./utils/Sync";
+import websocket, { GetLibrary, GetPrefs, GetTags } from "./websocket";
+
+const App = (initialContext: AppContext) => {
+  const [context, setContext] = useState<AppContext>(initialContext);
+
+  useOnMount(() => {
+    const syncData = ({ body }: IncomingMessage<Manga>) => {
+      if (!body) return;
+      console.info("[Global] Syncing data | %s | %s", body.title, body.id);
+      setContext(prevState => {
+        const library = Array.from(prevState.library || []);
+
+        const i = library.findIndex(m => m.id === body.id);
+        if (i >= 0) {
+          library[i] = Sync.Data(library[i], body);
+        } else if (body.followed) {
+          library.push(body);
+        }
+
+        return { ...prevState, library };
+      });
+    };
+
+    const syncChapter = ({ body }: IncomingMessage<Chapter>) => {
+      if (!body) return;
+      console.info("[Global] Sync chapter | %s | %s", body.id, body.mangaId);
+      setContext(prevState => {
+        const library = Array.from(prevState.library || []);
+
+        const i = library.findIndex(m => m.id === body.mangaId);
+        if (i >= 0) {
+          const chapters = library[i].chapters || [];
+
+          const j = chapters.findIndex(c => c.id === body.id);
+          if (j >= 0) {
+            chapters[j] = Sync.Chapter(chapters[j], body);
+          } else {
+            chapters.push(body);
+          }
+          library[i].chapters = chapters;
+        }
+
+        return { ...prevState, library };
+      });
+    };
+
+    const syncChapters = ({ body }: IncomingMessage<Chapter[]>) => {
+      if (!body) return;
+      console.info("[Global] Sync chapters | %s", body[0].mangaId);
+      setContext(prevState => {
+        const library = Array.from(prevState.library || []);
+
+        const i = library.findIndex(m => m.id === body[0].mangaId);
+        if (i >= 0) {
+          const chapters = library[i].chapters || [];
+          library[i].chapters = Sync.Chapters(chapters, body);
+        }
+        return { ...prevState, library };
+      });
+    };
+
+    websocket.Handle<Manga>(Task.GetManga, syncData);
+    websocket.Handle<Manga>(Task.UpdateManga, syncData);
+    websocket.Handle<Manga>(Task.FollowManga, syncData);
+    websocket.Handle<Manga>(Task.UnfollowManga, syncData);
+
+    websocket.Handle<Chapter>(Task.GetChapter, syncChapter);
+    websocket.Handle<Chapter>(Task.UpdateChapter, syncChapter);
+
+    websocket.Handle<Chapter[]>(Task.GetChapters, syncChapters);
+    websocket.Handle<Chapter[]>(Task.UpdateChapters, syncChapters);
+
+    websocket.Handle<Chapter>(Task.ReadChapter, syncChapter);
+    websocket.Handle<Chapter[]>(Task.ReadChapters, syncChapters);
+    websocket.Handle<Chapter[]>(Task.UnreadChapter, syncChapters);
+
+    websocket.Handle<Manga[]>(Task.Library, ({ body }) => {
+      console.info("[Global] Syncing library...");
+      setContext(prevState => ({ ...prevState, library: Sync.All(prevState.library, body) }));
+    });
+
+    websocket.Handle<BrowsePreference>(Task.UpdateBrowsePreference, ({ body }) => {
+      if (body) {
+        console.info("[Global] Syncing browse preference...");
+        setContext(prevState => ({ ...prevState, prefs: { ...prevState.prefs, browse: { ...body } } }));
+      }
+    });
+
+    websocket.Handle<LibraryPreference>(Task.UpdateLibraryPreference, ({ body }) => {
+      if (body) {
+        console.info("[Global] Syncing library preference...");
+        setContext(prevState => ({ ...prevState, prefs: { ...prevState.prefs, library: { ...body } } }));
+      }
+    });
+
+    websocket.Handle<ReaderPreference>(Task.UpdateReaderPreference, ({ body }) => {
+      if (body) {
+        console.info("[Global] Syncing reader preference...");
+        setContext(prevState => ({ ...prevState, prefs: { ...prevState.prefs, reader: { ...body } } }));
+      }
+    });
+  });
+
+  return (
+    <AppContext.Provider value={useMemo(() => ({ context, setContext }), [context])}>
+      <Switch>
+        <Route path={routes.browse} component={Browse} />
+        <Route path={`${routes.manga}/:id`} component={Manga} />
+        <Route path={`${routes.reader}/:id/:cid`} component={Reader} />
+        <Route path={routes.library} component={Library} />
+      </Switch>
+    </AppContext.Provider>
+  );
+};
+
+// Entry point
+const main = async () => {
+  const container = document.getElementById("app");
+  if (!container) {
+    return;
+  }
+
+  await websocket.Init();
+
+  const { response: prefs, error: err1 } = await GetPrefs();
+  if (err1) {
+    console.error(err1);
+    container.textContent = err1.message;
+    return;
+  }
+
+  const { response: tags, error: err2 } = await GetTags();
+  if (err2) {
+    console.error(err2);
+    container.textContent = err2.message;
+    return;
+  }
+
+  const { response: library, error: err3 } = await GetLibrary();
+  if (err3) {
+    console.error(err3);
+    container.textContent = err3.message;
+    return;
+  }
+
+  render(
+    <Router>
+      <App prefs={prefs} tags={tags} library={library} />
+    </Router>,
+    container
+  );
+};
+main();

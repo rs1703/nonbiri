@@ -1,0 +1,155 @@
+@import "variables";
+
+.history,
+.updates {
+  position: relative;
+  max-width: 192rem;
+  min-height: calc(100vh - @header-height);
+  margin: auto;
+  padding: 0 1rem 1rem;
+}
+
+.historyContent,
+.updatesContent {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 1770px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 1128px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 758px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.history > .loading,
+.updates > .loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.group {
+  border-top: 0.3rem solid @secondary-bg;
+  padding-top: 1rem;
+
+  display: flex;
+  gap: 1rem;
+}
+
+.figure {
+  width: 8rem;
+}
+
+.cover {
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
+  background-color: @primary-bg;
+  border-radius: 0.4rem;
+  position: relative;
+  overflow: hidden;
+  height: 0;
+  padding-top: calc(364 / 256 * 100%);
+
+  span {
+    display: none;
+  }
+}
+
+.hidden .cover a {
+  opacity: 0;
+}
+
+.content {
+  position: relative;
+  flex: 1 0;
+  width: 0;
+
+  h2 {
+    font-weight: 600;
+    line-height: 1.8rem;
+    margin-bottom: 0.4rem;
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.list {
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
+  background-color: @primary-bg;
+  border-radius: 0.4rem;
+  list-style: none;
+
+  position: relative;
+  overflow: hidden;
+
+  li {
+    transition: @linear;
+    transition-property: opacity;
+
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    height: 5.55rem;
+
+    &:nth-child(odd) {
+      background-color: @secondary-bg;
+    }
+
+    a {
+      transition: @linear;
+      transition-property: opacity;
+
+      flex: 1 0;
+      width: 0;
+      padding: 0.8rem 1.2rem;
+    }
+
+    &[data-readed] a,
+    &[data-deleted] a {
+      opacity: 0.5;
+    }
+
+    button {
+      font-size: 2rem;
+      padding: 1.2rem;
+    }
+
+    &:not(:hover) button {
+      display: none;
+    }
+  }
+}
+
+.list h3,
+.info {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list .hidden {
+  opacity: 0;
+}
+
+.pagination {
+  z-index: 100;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 4.8rem;
+  height: 4.8rem;
+  margin: 2rem;
+}

@@ -1,0 +1,53 @@
+@import "normalize";
+
+*,
+*:before,
+*:after {
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+a,
+button {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+img,
+picture {
+  vertical-align: top;
+  max-width: 100%;
+}
+
+form,
+input,
+select,
+button,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
