@@ -26,7 +26,7 @@ func init() {
 func Init() {
 	once.Do(func() {
 		var err error
-		DB, err = sqlx.Open("sqlite3", "nonbiri-sqlite3.db?cache=shared&_journal=WAL")
+		DB, err = sqlx.Open("sqlite3", "nonbiri.db?cache=shared&_journal=WAL")
 		if err != nil {
 			logger.UnexpectedFatal(err)
 		}
