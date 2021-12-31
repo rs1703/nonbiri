@@ -2,21 +2,20 @@
 
 Nonbiri is a self-hosted back-end and front-end for MangaDex.
 
+For now this project is just something that I made for myself on my spare time, mainly because I want to read manga on my desktop without having to deal with MangaDex's clunky UI, while also want something like Tachiyomi but on browser. So feel free to contribute or fork your own.
+
 _The UI is inspired by [Tachiyomi](https://github.com/tachiyomiorg/tachiyomi)._
 
 ## Features
 
-- Online read and browse MangaDex
-- Offline read and download chapters
+- Online/offline read and browse MangaDex
 - History tracker and scheduled updates
-- Chapters and covers are automatically cached forever
+- Chapters and covers are automatically downloaded/cached forever
 - Real-time synchronization between tabs/browsers and computers
 - Long strip, right-to-left and left-to-right reading modes
 - Customizable keyboard shortcuts for navigating between pages and chapters
 
-Library and history are stored locally, Nonbiri will not push follows and reading history to MangaDex for obvious reasons, but integration with third-party trackers will be added in the future.
-
-_More features and alternative manga sources will also be added in the future._
+Library and history are stored locally, Nonbiri will not push follows and reading history to MangaDex for obvious reasons.
 
 ## Installation
 
