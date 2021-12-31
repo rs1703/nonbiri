@@ -57,22 +57,24 @@ type Map map[string]*Manga
 var count uint8
 
 func All() (result Slice) {
-	if err := DB.Select(&result, `
-	SELECT manga.*,	COUNT(chapter.id) totalChapters, COUNT(history.id) readedChapters, MAX(chapter.publishAt) latestChapterAt FROM manga
-	LEFT JOIN chapter ON chapter.mangaId = manga.id
-	LEFT JOIN history ON history.chapterId = chapter.id AND history.readed = true
-	GROUP BY manga.id	ORDER BY latestChapterAt DESC`); err != nil {
+	q := `SELECT manga.*,	COUNT(chapter.id) totalChapters, COUNT(history.id) readedChapters, MAX(chapter.publishAt) latestChapterAt FROM manga
+				LEFT JOIN chapter ON chapter.mangaId = manga.id
+				LEFT JOIN history ON history.chapterId = chapter.id AND history.readed = true
+				GROUP BY manga.id	ORDER BY latestChapterAt DESC`
+
+	if err := DB.Select(&result, q); err != nil {
 		logger.Unexpected(err)
 	}
 	return
 }
 
 func Follows() (result Slice) {
-	if err := DB.Select(&result, `
-	SELECT manga.*,	COUNT(chapter.id) totalChapters, COUNT(history.id) readedChapters, MAX(chapter.publishAt) latestChapterAt FROM manga
-	LEFT JOIN chapter ON chapter.mangaId = manga.id
-	LEFT JOIN history ON history.chapterId = chapter.id AND history.readed = true
-	WHERE manga.followed = true GROUP BY manga.id ORDER BY latestChapterAt DESC`); err != nil {
+	q := `SELECT manga.*,	COUNT(chapter.id) totalChapters, COUNT(history.id) readedChapters, MAX(chapter.publishAt) latestChapterAt FROM manga
+				LEFT JOIN chapter ON chapter.mangaId = manga.id
+				LEFT JOIN history ON history.chapterId = chapter.id AND history.readed = true
+				WHERE manga.followed = true GROUP BY manga.id ORDER BY latestChapterAt DESC`
+
+	if err := DB.Select(&result, q); err != nil {
 		logger.Unexpected(err)
 	}
 	return
@@ -117,29 +119,31 @@ func ByChapter(id string, getChapters bool) (result *Manga, err error) {
 }
 
 func (m *Manga) UpdateMetadata(tx *sqlx.Tx) (sql.Result, error) {
-	return NamedExec(tx)(`
-		INSERT OR IGNORE INTO manga (id, title, cover)
-		VALUES (:id, :title, :cover);
-		
-		UPDATE 	manga
-		SET 		createdAt 	= :createdAt, 	updatedAt 	= :updatedAt,
-						title 			= :title, 			description = :description,
-						cover 			= :cover, 			authors 		= :authors,
-						artists 		= :artists, 		tags 				= :tags,
-						links 			= :links, 			relateds 		= :relateds,
-						demographic = :demographic, origin 			= :origin,
-						rating 			= :rating, 			status 			= :status,
-						banner 			= :banner
-		WHERE 	id 					= :id`, m)
+	q := `INSERT OR IGNORE INTO manga (id, title, cover)
+				VALUES (:id, :title, :cover);
+				
+				UPDATE 	manga
+				SET 		createdAt 	= :createdAt, 	updatedAt 	= :updatedAt,
+								title 			= :title, 			description = :description,
+								cover 			= :cover, 			authors 		= :authors,
+								artists 		= :artists, 		tags 				= :tags,
+								links 			= :links, 			relateds 		= :relateds,
+								demographic = :demographic, origin 			= :origin,
+								rating 			= :rating, 			status 			= :status,
+								banner 			= :banner
+				WHERE 	id 					= :id`
+
+	return NamedExec(tx)(q, m)
 }
 
 func (m *Manga) UpdateFollowState(tx *sqlx.Tx) (sql.Result, error) {
-	return NamedExec(tx)(`
-		UPDATE 	manga
-		SET			followed 		= :followed,
-						followState = :followState,
-						followedAt 	= :followedAt
-		WHERE 	id 					= :id`, m)
+	q := `UPDATE 	manga
+				SET			followed 		= :followed,
+								followState = :followState,
+								followedAt 	= :followedAt
+				WHERE 	id 					= :id`
+
+	return NamedExec(tx)(q, m)
 }
 
 func (s Slice) Map() (result Map) {

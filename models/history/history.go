@@ -69,6 +69,7 @@ func All(limit uint16) (result []*History) {
 					ELSE result.createdAt
 				END DESC
 				LIMIT ?`
+
 	if err := DB.Select(&result, q, limit); err != nil {
 		logger.Unexpected(err)
 	}
@@ -111,21 +112,22 @@ func (h *History) Save() (err error) {
 		return
 	}
 
-	return DB.Get(h, `
-		SELECT history.*, manga.id mangaId FROM history
-		LEFT JOIN chapter ON chapter.id = history.chapterId
-		LEFT JOIN manga ON manga.id = chapter.mangaId
-		WHERE history.chapterId = ?`, h.ChapterId)
+	q = `SELECT history.*, manga.id mangaId FROM history
+				LEFT JOIN chapter ON chapter.id = history.chapterId
+				LEFT JOIN manga ON manga.id = chapter.mangaId
+				WHERE history.chapterId = ?`
 
+	return DB.Get(h, q, h.ChapterId)
 }
 
 func (h *History) Update() (result sql.Result, err error) {
 	h.UpdatedAt = time.Now().Unix()
-	return DB.NamedExec(`
-		UPDATE 	history
-		SET			updatedAt 	= :updatedAt,
-						readed 			= :readed,
-						lastViewed 	= :lastViewed
-		WHERE 	chapterId 	= :chapterId
-	`, h)
+
+	q := `UPDATE 	history
+				SET			updatedAt 	= :updatedAt,
+								readed 			= :readed,
+								lastViewed 	= :lastViewed
+				WHERE 	chapterId 	= :chapterId`
+
+	return DB.NamedExec(q, h)
 }
