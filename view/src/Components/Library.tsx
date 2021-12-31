@@ -238,10 +238,10 @@ const Library = () => {
           <>
             {updateState && updateState.current && (
               <div styleName="updateState">
+                <span style={{ width: `${(updateState.progress / updateState.total) * 100}%` }} />
                 <strong>
                   Updating ({updateState.progress}/{updateState.total}): {updateState.current}
                 </strong>
-                <div style={{ width: `${(updateState.progress / updateState.total) * 100}%` }} />
               </div>
             )}
             <div styleName="libraryContent" ref={ref}>
