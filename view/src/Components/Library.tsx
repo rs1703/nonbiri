@@ -9,11 +9,12 @@ import utils from "../utils";
 import { formatQuery, parseQuery } from "../utils/encoding";
 import { useMounted, useMutableHistory } from "../utils/hooks";
 import { isQueryEmpty } from "../utils/validator";
-import websocket, { GetUpdateLibraryState, UpdateLibrary, UpdateLibraryPreference } from "../websocket";
+import websocket, { UpdateLibrary, UpdateLibraryPreference } from "../websocket";
 import Anchor from "./Anchor";
 import Entry from "./Entry";
 import Header from "./Header";
 import NotFound from "./NotFound";
+import UpdateProgress from "./UpdateProgress";
 
 const sortOptions: SortOptions = [
   ["Title", Sort.Title],
@@ -104,9 +105,7 @@ const Library = () => {
 
   const mountedRef = useMounted();
   const ref = useRef<HTMLDivElement>();
-
   const [isUpdating, setIsUpdating] = useState<boolean>();
-  const [updateState, setUpdateState] = useState<LibraryUpdateState>();
 
   const [query, setQuery] = useState<BrowseQuery>(() =>
     historyRef.current.location.search ? parseQuery(historyRef.current.location.search) : {}
@@ -141,7 +140,6 @@ const Library = () => {
 
   useEffect(() => {
     const pushUpdateState = ({ body }: IncomingMessage<LibraryUpdateState>) => {
-      setUpdateState(body);
       setIsUpdating(!!body);
     };
 
@@ -149,8 +147,6 @@ const Library = () => {
       websocket.Handle(Task.UpdateLibrary, pushUpdateState),
       websocket.Handle(Task.GetUpdateLibraryState, pushUpdateState)
     ];
-
-    GetUpdateLibraryState();
 
     return () => {
       removers.forEach(remove => remove());
@@ -236,14 +232,7 @@ const Library = () => {
       <div styleName="library">
         {data?.length ? (
           <>
-            {updateState && updateState.current && (
-              <div styleName="updateState">
-                <span style={{ width: `${(updateState.progress / updateState.total) * 100}%` }} />
-                <strong>
-                  Updating ({updateState.progress}/{updateState.total}): {updateState.current}
-                </strong>
-              </div>
-            )}
+            <UpdateProgress />
             <div styleName="libraryContent" ref={ref}>
               {data.slice(0, Config.library.limit * page).map(v => (
                 <Entry manga={v} key={v.id} />

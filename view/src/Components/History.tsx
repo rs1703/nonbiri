@@ -13,6 +13,7 @@ import Header from "./Header";
 import NotFound from "./NotFound";
 import Picture from "./Picture";
 import Spinner from "./Spinner";
+import UpdateProgress from "./UpdateProgress";
 
 interface HistoryEntry {
   id: string;
@@ -273,12 +274,15 @@ const History = () => {
                 <p>You have not readed any manga.</p>
               </NotFound>
             ) : (
-              <div styleName="historyContent" ref={ref}>
-                {feed.map((e, i) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Entry data={e} key={`${e.id}-${i}`} />
-                ))}
-              </div>
+              <>
+                <UpdateProgress />
+                <div styleName="historyContent" ref={ref}>
+                  {feed.map((e, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Entry data={e} key={`${e.id}-${i}`} />
+                  ))}
+                </div>
+              </>
             ))()
         )}
       </div>
