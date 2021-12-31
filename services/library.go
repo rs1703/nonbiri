@@ -131,7 +131,7 @@ func ScheduleUpdate() {
 				scheduler.Ticker.Stop()
 				return
 			case <-scheduler.Ticker.C:
-				if updateState != nil {
+				if updateState == nil {
 					UpdateLibrary()
 				}
 			}
