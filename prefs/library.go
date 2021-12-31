@@ -13,7 +13,7 @@ type LibraryPreference struct {
 
 var Library = &LibraryPreference{
 	Sort:  Sorts.LatestUploadedChapter,
-	Order: Orders.ASC,
+	Order: Orders.DESC,
 }
 
 func (*LibraryPreference) Update(new *LibraryPreference) {
