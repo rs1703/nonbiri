@@ -10,7 +10,6 @@ For now this project is just something that I made for myself on my spare time, 
 
 ![Memory usage](https://raw.githubusercontent.com/rs1703/nonbiri/gh-pages/2.png)
 
-
 ## Features
 
 - Online/offline read and browse MangaDex
@@ -24,11 +23,11 @@ Library and history are stored locally, Nonbiri will not push follows and readin
 
 ## Installation
 
-Pre-built binaries are available on [releases page](http://).
+~~Pre-built binaries are available on [releases page](#).~~
 
 ### Usage
 
-Run `nonbiri`, then open `localhost:<port>` on your web browser.
+Run `nonbiri`, then open `localhost:42071` on your web browser.
 
 ## Compiling
 
@@ -77,10 +76,10 @@ Knowledge about networking is required.
 If you are running the back-end on linux, simply add the port which used by the back-end into the firewall. To do so, execute the following command:
 
 ```bash
-ufw allow <port>
+ufw allow 42071
 ```
 
-Then you will be able to access the front-end through your local IP address, e.g., `192.168.x.x:<port>`.
+Then you will be able to access the front-end through your local IP address, e.g., `192.168.x.x:42071`.
 
 To find out about your local IP address, execute the following command:
 
