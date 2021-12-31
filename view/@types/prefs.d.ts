@@ -35,7 +35,6 @@ declare global {
     maxParallel: number;
 
     keybinds: Keybinds;
-    keyScrollSpeed: string;
   }
 
   interface Keybinds {
