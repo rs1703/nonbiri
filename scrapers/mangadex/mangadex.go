@@ -23,8 +23,18 @@ type Response[T any] struct {
 	Result               string
 	Limit, Offset, Total int
 
+	*ChapterPagesMetadata
+
 	Token           *Token
 	IsAuthenticated bool
+}
+
+type ChapterPagesMetadata struct {
+	BaseURL string `json:"baseUrl"`
+	Chapter struct {
+		Data []string
+		Hash string
+	}
 }
 
 type QueryResultInfo struct {

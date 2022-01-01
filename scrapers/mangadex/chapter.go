@@ -103,6 +103,15 @@ func GetChapter(id string) (*Chapter, error) {
 			return nil, errors.New(res.Errors[0].Detail)
 		}
 	}
+
+	if len(res.Data.Attributes.Hash) == 0 || len(res.Data.Attributes.Data) == 0 {
+		pagesMetadata, err := GetPages(id)
+		if err != nil {
+			return nil, err
+		}
+		res.Data.Attributes.Hash = pagesMetadata.Chapter.Hash
+		res.Data.Attributes.Data = pagesMetadata.Chapter.Data
+	}
 	return res.Data, nil
 }
 
@@ -137,6 +146,17 @@ func GetChapters(mangaId string, q FeedQuery) ([]*Chapter, error) {
 		res := &Response[[]*Chapter]{}
 		if err := utils.Unmarshal(buf, res); err != nil {
 			return nil, err
+		}
+
+		for _, entry := range res.Data {
+			if len(entry.Attributes.Hash) == 0 || len(entry.Attributes.Data) == 0 {
+				pagesMetadata, err := GetPages(entry.ID)
+				if err != nil {
+					return nil, err
+				}
+				entry.Attributes.Hash = pagesMetadata.Chapter.Hash
+				entry.Attributes.Data = pagesMetadata.Chapter.Data
+			}
 		}
 
 		entries = append(entries, res.Data...)
@@ -204,4 +224,24 @@ func SearchChapterEx(q ChapterQuery) ([]*chapter.Chapter, *QueryResultInfo, erro
 		}
 	}
 	return entries, info, err
+}
+
+func GetPages(chapterId string) (*ChapterPagesMetadata, error) {
+	limiter.Wait(context.Background())
+
+	u := path.Join("/at-home/server", chapterId)
+	buf, err := get(buildURL(u))
+	if err != nil {
+		return nil, err
+	}
+
+	res := &Response[any]{}
+	if err := utils.Unmarshal(buf, res); err != nil {
+		return nil, err
+	}
+
+	if len(res.Errors) > 0 {
+		return nil, errors.New(res.Errors[0].Detail)
+	}
+	return res.ChapterPagesMetadata, err
 }
