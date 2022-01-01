@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useRouteMatch } from "react-router";
 import AppContext from "../../AppContext";
+import { Task } from "../../constants";
 import "../../styles/Reader.less";
 import utils from "../../utils";
-import { formatChapter } from "../../utils/encoding";
-import { useMounted, useMutableLocation, useMutableMemo } from "../../utils/hooks";
-import { GetChapters, GetManga, ReadChapter, ReadPage, UpdateChapters, UpdateManga } from "../../websocket";
+import { deepClone, formatChapter } from "../../utils/encoding";
+import { useMounted, useMutableHistory, useMutableLocation, useMutableMemo } from "../../utils/hooks";
+import Sync from "../../utils/Sync";
+import websocket, { GetChapters, GetManga, ReadChapter, ReadPage, UpdateChapters, UpdateManga } from "../../websocket";
 import NotFound from "../NotFound";
 import Spinner from "../Spinner";
 import Main from "./Main";
@@ -29,8 +31,13 @@ const findByGroups = (current: Chapter, target: Chapter, chapters: Chapter[]): C
   return result || target;
 };
 
+/**
+ * Fix/optimize: data/state management
+ * right now they're copy pasted from components/manga
+ */
 const Reader = () => {
   const { mangaId, chapterId } = useRouteMatch<RouteContext>("*/:mangaId/:chapterId").params;
+  const historyRef = useMutableHistory<LocationContext>();
   const stateRef = useMutableLocation<LocationContext>();
 
   const { library } = useContext(AppContext).context;
@@ -94,6 +101,122 @@ const Reader = () => {
   const [isUpdating, setIsUpdating] = useState<boolean>();
 
   useEffect(() => {
+    const updateData = ({ body }: IncomingMessage<Manga>) => {
+      if (!body || body.id !== mangaId) {
+        return;
+      }
+
+      console.info("[Manga] Synchronizing data...");
+      Object.assign((dataRef.current ??= {} as Manga), body);
+      historyRef.current.replace({
+        state: {
+          ...stateRef.current,
+          data: { ...dataRef.current }
+        }
+      });
+    };
+
+    const updateChapter = ({ body }: IncomingMessage<Chapter>) => {
+      if (!body || body.mangaId !== mangaId) {
+        return;
+      }
+
+      console.info("[Manga] Synchronizing chapter...");
+      const chapters = (dataRef.current.chapters ??= []);
+
+      const chapter = chapters.find(c => c.id === body.id);
+      if (chapter) {
+        Object.assign(chapter, body);
+      } else {
+        chapters.push(body);
+      }
+
+      historyRef.current.replace({
+        state: {
+          ...stateRef.current,
+          data: { ...dataRef.current }
+        }
+      });
+    };
+
+    const updateChapters = ({ body }: IncomingMessage<Chapter[]>) => {
+      if (!body?.length || body[0].mangaId !== mangaId) {
+        return;
+      }
+
+      console.info("[Manga] Synchronizing chapters...");
+      const chapters = (dataRef.current.chapters ??= []);
+
+      for (let i = 0; i < body.length; i++) {
+        const chapter = chapters.find(c => c.id === body[i].id);
+        if (chapter) {
+          Object.assign(chapter, body[i]);
+        } else {
+          chapters.push(body[i]);
+        }
+      }
+
+      historyRef.current.replace({
+        state: {
+          ...stateRef.current,
+          data: { ...dataRef.current }
+        }
+      });
+    };
+
+    const updateHistory = ({ body }: IncomingMessage<ReadState>) => {
+      if (!body || body.mangaId !== mangaId) {
+        return;
+      }
+
+      console.info("[Manga] Synchronizing history...");
+      const chapters = (dataRef.current.chapters ??= []);
+      dataRef.current.chapters = Sync.History(deepClone(chapters), body);
+
+      historyRef.current.replace({
+        state: {
+          ...stateRef.current,
+          data: { ...dataRef.current }
+        }
+      });
+    };
+
+    const updateHistories = ({ body }: IncomingMessage<ReadState[]>) => {
+      if (!body?.length || body[0].mangaId !== mangaId) {
+        return;
+      }
+
+      console.info("[Manga] Synchronizing histories...");
+      const chapters = (dataRef.current.chapters ??= []);
+
+      if (chapters.length) {
+        const clone = deepClone(chapters);
+        for (let i = 0; i < body.length; i++) {
+          dataRef.current.chapters = Sync.History(clone, body[i]);
+        }
+      }
+
+      historyRef.current.replace({
+        state: { ...stateRef.current, data: { ...dataRef.current } }
+      });
+    };
+
+    const removeHandlers = [
+      websocket.Handle(Task.GetManga, updateData),
+      websocket.Handle(Task.UpdateManga, updateData),
+      websocket.Handle(Task.FollowManga, updateData),
+      websocket.Handle(Task.UnfollowManga, updateData),
+
+      websocket.Handle(Task.GetChapter, updateChapter),
+      websocket.Handle(Task.UpdateChapter, updateChapter),
+      websocket.Handle(Task.GetChapters, updateChapters),
+      websocket.Handle(Task.UpdateChapters, updateChapters),
+
+      websocket.Handle(Task.ReadPage, updateHistory),
+      websocket.Handle(Task.ReadChapter, updateHistories),
+      websocket.Handle(Task.UnreadChapter, updateHistories)
+    ];
+
     (async () => {
       if (!dataRef.current) {
         const track = utils.Track("[Reader] Getting metadata...");
@@ -133,6 +256,10 @@ const Reader = () => {
       setIsLoading(false);
       setIsUpdating(false);
     })();
+
+    return () => {
+      removeHandlers.forEach(remove => remove());
+    };
   }, []);
 
   // Set/reset PageStates when chapteId or pages have been changed
