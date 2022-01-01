@@ -91,6 +91,9 @@ func UpdateLibrary() *UpdateState {
 
 		prefs.Library.LastUpdated = time.Now().Unix()
 		prefs.Library.Update(nil)
+
+		cacheLibrary(false)
+		cacheUpdates(false)
 	}()
 
 	return updateState
