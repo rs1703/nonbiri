@@ -128,11 +128,11 @@ const Sidebar = () => {
         break;
       case pref.keybinds.previousChapter:
         if (!prevChapter) break;
-        historyRef.current.push(`${routes.reader}/${dataRef.current.id}/${prevChapter.id}`, { data: dataRef });
+        historyRef.current.push(`${routes.reader}/${dataRef.current.id}/${prevChapter.id}`, { data: dataRef.current });
         break;
       case pref.keybinds.nextChapter:
         if (!nextChapter) break;
-        historyRef.current.push(`${routes.reader}/${dataRef.current.id}/${nextChapter.id}`, { data: dataRef });
+        historyRef.current.push(`${routes.reader}/${dataRef.current.id}/${nextChapter.id}`, { data: dataRef.current });
         break;
       default:
         break;
@@ -147,7 +147,7 @@ const Sidebar = () => {
       <div styleName="header">
         <Anchor
           styleName="title"
-          to={{ pathname: `${routes.manga}/${dataRef.current.id}`, state: { data: dataRef } }}
+          to={{ pathname: `${routes.manga}/${dataRef.current.id}`, state: { data: dataRef.current } }}
           title={dataRef.current.title}
         >
           {dataRef.current.title}
@@ -156,7 +156,10 @@ const Sidebar = () => {
           <Anchor
             to={
               prevChapter
-                ? { pathname: `${routes.reader}/${dataRef.current.id}/${prevChapter.id}`, state: { data: dataRef } }
+                ? {
+                    pathname: `${routes.reader}/${dataRef.current.id}/${prevChapter.id}`,
+                    state: { data: dataRef.current }
+                  }
                 : undefined
             }
             title="Previous chapter"
@@ -167,7 +170,10 @@ const Sidebar = () => {
           <Anchor
             to={
               nextChapter
-                ? { pathname: `${routes.reader}/${dataRef.current.id}/${nextChapter.id}`, state: { data: dataRef } }
+                ? {
+                    pathname: `${routes.reader}/${dataRef.current.id}/${nextChapter.id}`,
+                    state: { data: dataRef.current }
+                  }
                 : undefined
             }
             title="Next chapter"

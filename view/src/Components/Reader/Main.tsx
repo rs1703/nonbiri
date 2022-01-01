@@ -245,7 +245,7 @@ const Main = () => {
                     <Anchor
                       to={{
                         pathname: `${routes.reader}/${dataRef.current.id}/${nextChapter.id}`,
-                        state: { data: dataRef }
+                        state: { data: dataRef.current }
                       }}
                     >
                       Next Chapter
