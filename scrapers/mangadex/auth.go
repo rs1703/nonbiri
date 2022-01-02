@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"nonbiri/models/manga"
-	"nonbiri/utils"
-	"nonbiri/utils/query"
 	"time"
+
+	"nonbiri/models/manga"
+	"nonbiri/utils/query"
+
+	"nonbiri/utils"
 
 	"golang.org/x/time/rate"
 )
