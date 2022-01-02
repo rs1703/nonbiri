@@ -237,6 +237,7 @@ const Reader = () => {
         return;
       }
 
+      if (chapterRef.current?.externalURL) return;
       setIsUpdating(true);
 
       const track = utils.Track("[Reader] Retrieving latest metadata and chapters...");
@@ -264,7 +265,7 @@ const Reader = () => {
 
   // Set/reset PageStates when chapteId or pages have been changed
   useEffect(() => {
-    if (!chapterRef.current) return;
+    if (!chapterRef.current || chapterRef.current?.externalURL) return;
 
     const newPages: PageState[] = (chapterRef.current?.pages || []).map((_, i) => ({ num: i + 1 }));
     if (newPages.length) {
