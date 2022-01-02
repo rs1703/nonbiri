@@ -1,10 +1,10 @@
 import React, { Context, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { BiHide, BiShow, BiSort } from "react-icons/bi";
+import { BiHide, BiPencil, BiShow, BiSort } from "react-icons/bi";
 import { IoMdRefresh } from "react-icons/io";
 import { routes } from "../Config";
 import styles from "../styles/Chapters.less";
 import { formatChapter, formatDate, formatGroups } from "../utils/encoding";
-import { useIntersectionObserver, useMounted } from "../utils/hooks";
+import { useIntersectionObserver, useModal, useMounted } from "../utils/hooks";
 import { ReadChapter, UnreadChapter, UpdateChapters } from "../websocket";
 import Anchor from "./Anchor";
 import Spinner from "./Spinner";
@@ -103,6 +103,10 @@ interface ChaptersProps extends Props<HTMLDivElement> {
 const Chapters = ({ chapterId, context, ...props }: ChaptersProps) => {
   const { mountedRef, isLoading, isUpdating, dataRef, setIsUpdating } = useContext(context);
   const [isReverse, setIsReverse] = useState<boolean>();
+  const mutex = useRef<boolean>();
+
+  const ref = useRef<HTMLUListElement>();
+  const [isVisible, setIsVisible] = useState<boolean>();
 
   const chapters = useMemo(
     () => (isReverse ? Array.from(dataRef.current?.chapters || []).reverse() : dataRef.current?.chapters || []),
@@ -122,6 +126,22 @@ const Chapters = ({ chapterId, context, ...props }: ChaptersProps) => {
     setIsUpdating(false);
   }, [isLoading, isUpdating, setIsUpdating]);
 
+  const changeReadStates = useCallback(
+    async (read?: boolean) => {
+      if (isLoading || mutex.current) {
+        return;
+      }
+      mutex.current = true;
+
+      const fn = read ? ReadChapter : UnreadChapter;
+      await fn(...dataRef.current.chapters.map(c => c.id));
+      mutex.current = false;
+    },
+    [isLoading]
+  );
+
+  useModal(ref, isVisible, setIsVisible);
+
   return (
     <div {...props} styleName="chapters">
       {(!isLoading || hasChapters) && (
@@ -129,15 +149,36 @@ const Chapters = ({ chapterId, context, ...props }: ChaptersProps) => {
           <h2>Chapters{hasChapters && ` (${dataRef.current.chapters.length})`}</h2>
           <div styleName="actions">
             {hasChapters && (
-              <button
-                styleName="sort"
-                data-active={isReverse || undefined}
-                type="button"
-                title="Sort"
-                onClick={() => setIsReverse(!isReverse)}
-              >
-                <BiSort />
-              </button>
+              <>
+                <div styleName="changeReadState">
+                  <button type="button" title="Change read states" onClick={() => setIsVisible(!isVisible)}>
+                    <BiPencil />
+                  </button>
+                  {isVisible && (
+                    <ul styleName="pop" ref={ref}>
+                      <li>
+                        <button type="button" onClick={() => changeReadStates(true)}>
+                          Read all chapters
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => changeReadStates()}>
+                          Unread all chapters
+                        </button>
+                      </li>
+                    </ul>
+                  )}
+                </div>
+                <button
+                  styleName="sort"
+                  data-active={isReverse || undefined}
+                  type="button"
+                  title="Sort"
+                  onClick={() => setIsReverse(!isReverse)}
+                >
+                  <BiSort />
+                </button>
+              </>
             )}
             <button
               styleName="update"
