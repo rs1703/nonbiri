@@ -237,7 +237,11 @@ const Reader = () => {
         return;
       }
 
-      if (chapterRef.current?.externalURL) return;
+      if (chapterRef.current?.externalURL) {
+        setIsLoading(false);
+        return;
+      }
+
       setIsUpdating(true);
 
       const track = utils.Track("[Reader] Retrieving latest metadata and chapters...");
