@@ -5,6 +5,7 @@ import { useMutableHistory } from "../utils/hooks";
 const Anchor = ({ to, onClick, ...props }: NavLinkProps & Props<HTMLAnchorElement>, ref) => {
   const historyRef = useMutableHistory();
 
+  const isExternal = useMemo(() => typeof to === "string" && to.startsWith("http"), [to]);
   const toOverride = useMemo(() => {
     const context: any = typeof to === "string" || typeof to === "undefined" ? { pathname: to } : to;
     return {
@@ -30,7 +31,7 @@ const Anchor = ({ to, onClick, ...props }: NavLinkProps & Props<HTMLAnchorElemen
           ev.preventDefault();
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
-      } else if (!ev.altKey && !ev.ctrlKey && !ev.shiftKey) {
+      } else if (!ev.altKey && !ev.ctrlKey && !ev.shiftKey && !isExternal) {
         window.scrollTo(0, 0);
       }
     },
@@ -38,7 +39,14 @@ const Anchor = ({ to, onClick, ...props }: NavLinkProps & Props<HTMLAnchorElemen
   );
 
   return to ? (
-    <NavLink activeClassName="active" to={toOverride} onClick={onClickOverride} ref={ref} {...props} />
+    <NavLink
+      activeClassName="active"
+      to={toOverride}
+      onClick={onClickOverride}
+      target={isExternal ? "_blank" : undefined}
+      ref={ref}
+      {...props}
+    />
   ) : (
     <span {...props} />
   );
