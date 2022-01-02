@@ -37,7 +37,7 @@ func Login(o Authorization) (*Token, error) {
 	loginLimiter.Wait(context.Background())
 
 	url := buildURL("auth/login")
-	buf, err := postJSON(url, o)
+	buf, err := utils.PostJSON(url, o)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func RefreshToken(refreshToken string) (*Token, error) {
 	refreshLimiter.Wait(context.Background())
 
 	url := buildURL("auth/refresh")
-	buf, err := postJSON(url, fmt.Sprintf(`{"token": "%s"}`, refreshToken))
+	buf, err := utils.PostJSON(url, fmt.Sprintf(`{"token": "%s"}`, refreshToken))
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func CheckToken(sessionToken string) (bool, error) {
 	header["Authorization"] = fmt.Sprintf("Bearer %s", sessionToken)
 
 	url := buildURL("auth/check")
-	buf, err := get(url, header)
+	buf, err := utils.PostJSON(url, header)
 	if err != nil {
 		return false, err
 	}
@@ -143,7 +143,7 @@ func GetFollows(token *Token, q FollowQuery) ([]*Manga, error) {
 	for {
 		_ = limiter.Wait(context.Background())
 
-		buf, err := get(q.buildURL())
+		buf, err := utils.Get(q.buildURL())
 		if err != nil {
 			return nil, err
 		}
