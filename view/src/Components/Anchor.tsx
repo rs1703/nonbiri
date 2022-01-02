@@ -30,7 +30,7 @@ const Anchor = ({ to, onClick, ...props }: NavLinkProps & Props<HTMLAnchorElemen
           ev.preventDefault();
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
-      } else {
+      } else if (!ev.altKey && !ev.ctrlKey && !ev.shiftKey) {
         window.scrollTo(0, 0);
       }
     },
