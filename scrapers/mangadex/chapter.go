@@ -86,7 +86,7 @@ func GetChapter(id string) (*Chapter, error) {
 	q.Add("includes[]", "scanlation_group")
 
 	url := buildURL(path.Join("chapter", id), q)
-	buf, err := get(url)
+	buf, err := utils.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func GetChapters(mangaId string, q FeedQuery) ([]*Chapter, error) {
 		_ = limiter.Wait(context.Background())
 
 		url := buildURL(fmt.Sprintf("manga/%s/feed", mangaId), queries)
-		buf, err := get(url)
+		buf, err := utils.Get(url)
 		if err != nil {
 			return nil, err
 		}
@@ -194,7 +194,7 @@ func SearchChapter(q ChapterQuery) ([]*Chapter, *QueryResultInfo, error) {
 	}
 	_ = limiter.Wait(context.Background())
 
-	buf, err := get(q.buildURL())
+	buf, err := utils.Get(q.buildURL())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -230,7 +230,7 @@ func GetPages(chapterId string) (*ChapterPagesMetadata, error) {
 	limiter.Wait(context.Background())
 
 	u := path.Join("/at-home/server", chapterId)
-	buf, err := get(buildURL(u))
+	buf, err := utils.Get(buildURL(u))
 	if err != nil {
 		return nil, err
 	}

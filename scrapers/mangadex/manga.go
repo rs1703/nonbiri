@@ -68,7 +68,7 @@ func GetManga(id string) (*Manga, error) {
 	q.Add("includes[]", "artist")
 
 	url := buildURL(path.Join("manga", id), q)
-	buf, err := get(url)
+	buf, err := utils.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func SearchManga(q MangaQuery) ([]*Manga, *QueryResultInfo, error) {
 
 	_ = limiter.Wait(context.Background())
 
-	buf, err := get(q.buildURL())
+	buf, err := utils.Get(q.buildURL())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -145,7 +145,7 @@ func SearchMangaEx(q MangaQuery) (manga.Slice, *QueryResultInfo, error) {
 func Tags() ([]*Tag, error) {
 	_ = limiter.Wait(context.Background())
 
-	buf, err := get(buildURL("manga/tag"))
+	buf, err := utils.Get(buildURL("manga/tag"))
 	if err != nil {
 		return nil, err
 	}
