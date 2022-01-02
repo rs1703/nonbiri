@@ -4,7 +4,7 @@ import { routes } from "../../Config";
 import { PageDirection, PageScale } from "../../constants";
 import "../../styles/Reader.less";
 import { loadImage } from "../../utils";
-import { formatPageURL } from "../../utils/encoding";
+import { formatGroups, formatPageURL } from "../../utils/encoding";
 import { useMounted } from "../../utils/hooks";
 import Anchor from "../Anchor";
 import NotFound from "../NotFound";
@@ -257,9 +257,19 @@ const Main = () => {
               )}
             </>
           ) : (
-            <NotFound>
-              <p>Chapter does not exists</p>
-            </NotFound>
+            (() =>
+              chapterRef.current.externalURL ? (
+                <div styleName="external">
+                  <p>
+                    This chapter can only be readed on{" "}
+                    <Anchor to={chapterRef.current.externalURL}>{formatGroups(chapterRef.current.groups)}</Anchor>
+                  </p>
+                </div>
+              ) : (
+                <NotFound>
+                  <p>Chapter does not exists</p>
+                </NotFound>
+              ))()
           ))()
       )}
     </div>
