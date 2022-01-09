@@ -2,7 +2,8 @@ package services
 
 import (
 	"nonbiri/prefs"
-	"nonbiri/utils"
+
+	"github.com/rs1703/logger"
 )
 
 type Prefs struct {
@@ -12,7 +13,8 @@ type Prefs struct {
 }
 
 func GetPrefs() *Prefs {
-	defer utils.Track("services.GetPrefs")()
+	defer logger.Track()()
+
 	return &Prefs{
 		prefs.Browse,
 		prefs.Library,

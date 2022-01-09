@@ -2,7 +2,8 @@ package services
 
 import (
 	"nonbiri/models/chapter"
-	"nonbiri/utils"
+
+	"github.com/rs1703/logger"
 )
 
 var uCache chapter.Slice
@@ -10,7 +11,7 @@ var uCache chapter.Slice
 func Updates(isCaching bool) (_ chapter.Slice, err error) {
 	var track func()
 	if !isCaching {
-		track = utils.Track("services.Updates")
+		track = logger.Track()
 	}
 
 	if len(uCache) == 0 {

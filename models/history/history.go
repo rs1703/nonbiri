@@ -6,10 +6,11 @@ import (
 
 	. "nonbiri/constants"
 	. "nonbiri/database"
-	"nonbiri/utils/logger"
 
 	"nonbiri/models/entity"
 	"nonbiri/utils/nullable"
+
+	"github.com/rs1703/logger"
 )
 
 type History struct {
@@ -71,7 +72,7 @@ func All(limit uint16) (result []*History) {
 				LIMIT ?`
 
 	if err := DB.Select(&result, q, limit); err != nil {
-		logger.Unexpected(err)
+		logger.Err.Println(err)
 	}
 	return
 }

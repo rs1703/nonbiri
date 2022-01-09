@@ -4,14 +4,15 @@ import (
 	. "nonbiri/constants"
 	. "nonbiri/database"
 	"nonbiri/prefs"
-	"nonbiri/utils"
 
 	"nonbiri/models/chapter"
 	"nonbiri/scrapers/mangadex"
+
+	"github.com/rs1703/logger"
 )
 
 func GetChapter(id string) (_ *chapter.Chapter, err error) {
-	defer utils.Track("services.GetChapter")()
+	defer logger.Track()()
 
 	data, err := chapter.One(id)
 	if err != nil {
@@ -22,7 +23,7 @@ func GetChapter(id string) (_ *chapter.Chapter, err error) {
 }
 
 func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
-	defer utils.Track("services.UpdateChapter")()
+	defer logger.Track()()
 
 	data, err := chapter.One(id)
 	if err != nil {
@@ -54,12 +55,13 @@ func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
 }
 
 func GetChapters(mangaId string) ([]*chapter.Chapter, error) {
-	defer utils.Track("services.GetChapters")()
+	defer logger.Track()()
+
 	return chapter.ByManga(mangaId), nil
 }
 
 func UpdateChapters(mangaId string, isUpdating bool) (_ []*chapter.Chapter, err error) {
-	defer utils.Track("services.UpdateChapters")()
+	defer logger.Track()()
 
 	chapters := chapter.ByManga(mangaId)
 	newChapters, err := mangadex.GetChaptersEx(mangaId, mangadex.FeedQuery{

@@ -4,12 +4,15 @@ import (
 	"nonbiri/models/tag"
 	"nonbiri/utils"
 	"sort"
+
+	"github.com/rs1703/logger"
 )
 
 var tCache tag.Slice
 
 func Tags() tag.Slice {
-	defer utils.Track("services.Tags")()
+	defer logger.Track()()
+
 	if len(tCache) == 0 {
 		tCache = tag.All()
 		sort.SliceStable(tCache, func(i, j int) bool {

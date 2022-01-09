@@ -4,10 +4,10 @@ import (
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/rs1703/logger"
 	"github.com/spf13/viper"
 
 	"nonbiri/utils"
-	"nonbiri/utils/logger"
 )
 
 var mutex = sync.Mutex{}
@@ -24,7 +24,7 @@ func init() {
 
 	viper.SafeWriteConfig()
 	if err := viper.ReadInConfig(); err != nil {
-		logger.UnexpectedFatal(err)
+		logger.Err.Fatalln(err)
 	}
 
 	mutex.Lock()

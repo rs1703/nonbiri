@@ -7,7 +7,8 @@ import (
 	"nonbiri/models/entity"
 	"nonbiri/models/manga"
 	"nonbiri/models/tag"
-	"nonbiri/utils/logger"
+
+	"github.com/rs1703/logger"
 )
 
 type Localizations struct {
@@ -37,7 +38,7 @@ func (self *Manga) Normalize() *manga.Manga {
 	if self.Attributes.Links != nil {
 		if jSON, valid := self.Attributes.Links.(map[string]any); valid {
 			if err := utils.Unmarshal(jSON, &m.Links); err != nil {
-				logger.Unexpected(err)
+				logger.Err.Println(err)
 			}
 		}
 	}
@@ -45,7 +46,7 @@ func (self *Manga) Normalize() *manga.Manga {
 	if self.Attributes.Links != nil {
 		if jSON, valid := self.Attributes.Links.(map[string]any); valid {
 			if err := utils.Unmarshal(jSON, &m.Links); err != nil {
-				logger.Unexpected(err)
+				logger.Err.Println(err)
 			}
 		}
 	}
@@ -131,7 +132,7 @@ func (self *Manga) Normalize() *manga.Manga {
 			attrs := &mAttrs{}
 			if jSON, valid := r.Attributes.(map[string]any); valid {
 				if err := utils.Unmarshal(jSON, attrs); err != nil {
-					logger.Unexpected(err)
+					logger.Err.Println(err)
 				} else {
 					related := &manga.Related{ID: r.ID, Type: r.Related}
 					if parseLocalizations(attrs.Title, &related.Title) {
@@ -159,7 +160,7 @@ func parseLocalizations(data any, dst *string) bool {
 		if jSON, valid := data.(map[string]any); valid {
 			loc := &Localizations{}
 			if err := utils.Unmarshal(jSON, loc); err != nil {
-				logger.Unexpected(err)
+				logger.Err.Println(err)
 			} else {
 				if len(loc.EN) > 0 {
 					*dst = loc.EN
@@ -180,7 +181,7 @@ func parseAttrs(data any) (attrs *rAttributes) {
 		if jSON, valid := data.(map[string]any); valid {
 			attrs := &rAttributes{}
 			if err := utils.Unmarshal(jSON, attrs); err != nil {
-				logger.Unexpected(err)
+				logger.Err.Println(err)
 			} else {
 				return attrs
 			}

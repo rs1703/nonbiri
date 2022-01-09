@@ -6,12 +6,12 @@ import (
 	. "nonbiri/constants"
 	. "nonbiri/database"
 	"nonbiri/utils"
-	"nonbiri/utils/logger"
 
 	"nonbiri/models/chapter"
 	"nonbiri/models/entity"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/rs1703/logger"
 )
 
 type Manga struct {
@@ -63,7 +63,7 @@ func All() (result Slice) {
 				GROUP BY manga.id	ORDER BY latestChapterAt DESC`
 
 	if err := DB.Select(&result, q); err != nil {
-		logger.Unexpected(err)
+		logger.Err.Println(err)
 	}
 	return
 }
@@ -75,7 +75,7 @@ func Follows() (result Slice) {
 				WHERE manga.followed = true GROUP BY manga.id ORDER BY latestChapterAt DESC`
 
 	if err := DB.Select(&result, q); err != nil {
-		logger.Unexpected(err)
+		logger.Err.Println(err)
 	}
 	return
 }
