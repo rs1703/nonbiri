@@ -11,18 +11,18 @@ import (
 	"github.com/rs1703/logger"
 )
 
-func GetChapter(id string) (_ *chapter.Chapter, err error) {
+func GetChapter(id string) (*chapter.Chapter, error) {
 	defer logger.Track()()
 
 	data, err := chapter.One(id)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	return data, nil
 }
 
-func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
+func UpdateChapter(id string) (*chapter.Chapter, error) {
 	defer logger.Track()()
 
 	data, err := chapter.One(id)
@@ -30,13 +30,13 @@ func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
 		if err == ErrChapterNotFound {
 			data = &chapter.Chapter{ID: id}
 		} else {
-			return
+			return nil, err
 		}
 	}
 
 	newData, err := mangadex.GetChapterEx(id)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	data.MangaId = newData.MangaId
@@ -46,7 +46,7 @@ func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
 	}
 
 	if _, err = data.UpdateMetadata(nil); err != nil {
-		return
+		return nil, err
 	}
 
 	cacheLibrary(false)
@@ -56,11 +56,10 @@ func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
 
 func GetChapters(mangaId string) ([]*chapter.Chapter, error) {
 	defer logger.Track()()
-
 	return chapter.ByManga(mangaId), nil
 }
 
-func UpdateChapters(mangaId string, isUpdating bool) (_ []*chapter.Chapter, err error) {
+func UpdateChapters(mangaId string, isUpdating bool) ([]*chapter.Chapter, error) {
 	defer logger.Track()()
 
 	chapters := chapter.ByManga(mangaId)
@@ -68,12 +67,12 @@ func UpdateChapters(mangaId string, isUpdating bool) (_ []*chapter.Chapter, err 
 		TranslatedLanguage: []string{prefs.Browse.Language.String()},
 	})
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	tx, err := DB.Beginx()
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	cMap := chapters.Map()
@@ -95,7 +94,7 @@ func UpdateChapters(mangaId string, isUpdating bool) (_ []*chapter.Chapter, err 
 	}
 
 	if err = tx.Commit(); err != nil {
-		return
+		return nil, err
 	}
 
 	cacheLibrary(isUpdating)

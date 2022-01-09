@@ -40,7 +40,7 @@ type BrowseQuery struct {
 	Order Order `json:"order,omitempty"`
 }
 
-func Browse(q BrowseQuery) (result *BrowseData, err error) {
+func Browse(q BrowseQuery) (*BrowseData, error) {
 	defer logger.Track()()
 
 	data, info, err := mangadex.SearchMangaEx(q.Denormalize())

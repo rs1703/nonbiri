@@ -8,12 +8,12 @@ import (
 	"github.com/rs1703/logger"
 )
 
-func Login(o mangadex.Authorization) (_ bool, err error) {
+func Login(o mangadex.Authorization) (bool, error) {
 	defer logger.Track()()
 
 	token, err := mangadex.Login(o)
 	if err != nil {
-		return
+		return false, err
 	}
 
 	prefs.Auth.SessionToken = token.Session
@@ -23,12 +23,12 @@ func Login(o mangadex.Authorization) (_ bool, err error) {
 	return true, nil
 }
 
-func RefreshToken() (_ bool, err error) {
+func RefreshToken() (bool, error) {
 	defer logger.Track()()
 
 	token, err := mangadex.RefreshToken(prefs.Auth.RefreshToken)
 	if err != nil {
-		return
+		return false, err
 	}
 
 	prefs.Auth.SessionToken = token.Session
@@ -40,7 +40,6 @@ func RefreshToken() (_ bool, err error) {
 
 func CheckToken() (bool, error) {
 	defer logger.Track()()
-
 	return mangadex.CheckToken(prefs.Auth.SessionToken)
 }
 
