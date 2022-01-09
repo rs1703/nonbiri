@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"nonbiri/utils/logger"
+
+	"github.com/rs1703/logger"
 )
 
 const userAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36"
@@ -31,7 +32,7 @@ func Get(url string, header ...map[string]string) (_ []byte, err error) {
 	}
 	defer func() {
 		if err := res.Body.Close(); err != nil {
-			logger.Unexpected(err)
+			logger.Err.Println(err)
 		}
 	}()
 	return io.ReadAll(res.Body)
@@ -64,7 +65,7 @@ func PostJSON(url string, body any, header ...map[string]string) (_ []byte, err 
 	}
 	defer func() {
 		if err := res.Body.Close(); err != nil {
-			logger.Unexpected(err)
+			logger.Err.Println(err)
 		}
 	}()
 	return io.ReadAll(res.Body)

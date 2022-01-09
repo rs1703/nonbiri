@@ -7,12 +7,12 @@ import (
 
 	. "nonbiri/constants"
 	. "nonbiri/database"
-	"nonbiri/utils/logger"
 
 	"nonbiri/models/entity"
 	"nonbiri/models/history"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/rs1703/logger"
 )
 
 type Chapter struct {
@@ -78,7 +78,7 @@ func All(limit uint16) (result Slice, err error) {
 				WHERE n <= 3 AND manga.followed = true ORDER BY chapter.publishAt DESC
 				LIMIT ?`
 	if err = DB.Select(&result, q, limit); err != nil {
-		logger.Unexpected(err)
+		logger.Err.Println(err)
 	}
 	return
 }

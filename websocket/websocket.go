@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"nonbiri/utils"
-	"nonbiri/utils/logger"
 
 	. "nonbiri/constants"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/rs1703/logger"
 )
 
 type Connection struct {
@@ -79,7 +79,7 @@ func init() {
 func Serve(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		logger.Unexpected(err)
+		logger.Err.Println(err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func (self *Connection) handleIncomingMessage() {
 		_, buf, err := self.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				logger.Unexpected(err)
+				logger.Err.Println(err)
 			}
 			break
 		}
@@ -133,7 +133,7 @@ func (self *Connection) handleIncomingMessage() {
 				if res != nil || err != nil {
 					reply := &OutgoingMessage{Identifier: message.Identifier, Task: message.Task, Body: res}
 					if err != nil {
-						logger.Errorln(message.Task, err)
+						logger.Err.Println(message.Task, err)
 						reply.Error = err.Error()
 					}
 
@@ -151,7 +151,7 @@ func (self *Connection) handleIncomingMessage() {
 					}
 				}
 			} else {
-				logger.Errorln("Unhandled task:", message.Task)
+				logger.Err.Println("Unhandled task:", message.Task)
 			}
 		}(buf)
 	}

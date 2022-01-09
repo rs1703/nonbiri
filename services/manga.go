@@ -9,10 +9,12 @@ import (
 	"nonbiri/models/manga"
 	"nonbiri/scrapers/anilist"
 	"nonbiri/scrapers/mangadex"
+
+	"github.com/rs1703/logger"
 )
 
 func GetManga(id string) (*manga.Manga, error) {
-	defer utils.Track("services.GetManga")()
+	defer logger.Track()()
 
 	data, err := manga.One(id, true)
 	if err != nil {
@@ -23,7 +25,7 @@ func GetManga(id string) (*manga.Manga, error) {
 }
 
 func UpdateManga(id string, isUpdating bool) (_ *manga.Manga, err error) {
-	defer utils.Track("services.UpdateManga")()
+	defer logger.Track()()
 
 	data, err := manga.One(id, false)
 	if err != nil {
@@ -67,7 +69,7 @@ func UpdateManga(id string, isUpdating bool) (_ *manga.Manga, err error) {
 }
 
 func FollowManga(id string, followState FollowState) (_ *manga.Manga, err error) {
-	defer utils.Track("services.FollowManga")()
+	defer logger.Track()()
 
 	data, err := manga.One(id, true)
 	if err != nil {
@@ -90,7 +92,7 @@ func FollowManga(id string, followState FollowState) (_ *manga.Manga, err error)
 }
 
 func UnfollowManga(id string) (_ *manga.Manga, err error) {
-	defer utils.Track("services.UnfollowManga")()
+	defer logger.Track()()
 
 	data, err := manga.One(id, true)
 	if err != nil {

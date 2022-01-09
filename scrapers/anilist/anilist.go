@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"nonbiri/utils"
-	"nonbiri/utils/logger"
 
+	"github.com/rs1703/logger"
 	"golang.org/x/time/rate"
 )
 
@@ -38,7 +38,7 @@ func GetBanner(mediaId string) (result string, _ error) {
 	}
 	defer func() {
 		if err := res.Body.Close(); err != nil {
-			logger.Unexpected(err)
+			logger.Err.Println(err)
 		}
 	}()
 

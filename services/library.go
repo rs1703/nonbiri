@@ -8,11 +8,11 @@ import (
 	. "nonbiri/database"
 
 	"nonbiri/models/manga"
-	"nonbiri/utils/logger"
 
 	"nonbiri/prefs"
-	"nonbiri/utils"
 	"nonbiri/websocket"
+
+	"github.com/rs1703/logger"
 )
 
 type UpdateState struct {
@@ -27,7 +27,7 @@ var updateState *UpdateState
 func Library(isCaching bool) manga.Slice {
 	var track func()
 	if !isCaching {
-		track = utils.Track("services.Library")
+		track = logger.Track()
 	}
 
 	if len(lCache) == 0 {
@@ -61,7 +61,7 @@ func UpdateLibrary() *UpdateState {
 
 		follows := manga.Slice{}
 		if err = DB.Select(&follows, q); err != nil {
-			logger.Unexpected(err)
+			logger.Err.Println(err)
 			return
 		}
 
@@ -79,7 +79,7 @@ func UpdateLibrary() *UpdateState {
 
 			entry, err = UpdateManga(entry.ID, true)
 			if err != nil {
-				logger.Unexpected(err)
+				logger.Err.Println(err)
 			}
 			updateState.Progress++
 		}

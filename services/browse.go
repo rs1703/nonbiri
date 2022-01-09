@@ -3,14 +3,13 @@ package services
 import (
 	. "nonbiri/constants"
 	. "nonbiri/database"
-	"nonbiri/utils"
-	"nonbiri/utils/logger"
 
 	"nonbiri/models/manga"
 	"nonbiri/models/tag"
 	"nonbiri/scrapers/mangadex"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/rs1703/logger"
 )
 
 type BrowseData struct {
@@ -42,11 +41,11 @@ type BrowseQuery struct {
 }
 
 func Browse(q BrowseQuery) (result *BrowseData, err error) {
-	defer utils.Track("services.Browse")()
+	defer logger.Track()()
 
 	data, info, err := mangadex.SearchMangaEx(q.Denormalize())
 	if err != nil {
-		logger.Errorln(err)
+		logger.Err.Println(err)
 		return nil, err
 	}
 
@@ -61,26 +60,26 @@ func Browse(q BrowseQuery) (result *BrowseData, err error) {
 
 		tx, err := DB.Beginx()
 		if err != nil {
-			logger.Errorln(err)
+			logger.Err.Println(err)
 			return nil, err
 		}
 
 		query, args, err := sqlx.In("SELECT * FROM manga WHERE id IN (?)", mIds)
 		if err != nil {
-			logger.Errorln(err)
+			logger.Err.Println(err)
 			return nil, err
 		}
 
 		rows, err := tx.Queryx(tx.Rebind(query), args...)
 		if err != nil {
-			logger.Errorln(err)
+			logger.Err.Println(err)
 			return nil, err
 		}
 
 		for rows.Next() {
 			m := &manga.Manga{}
 			if err := rows.StructScan(m); err != nil {
-				logger.Errorln(err)
+				logger.Err.Println(err)
 				return nil, err
 			}
 
@@ -88,13 +87,13 @@ func Browse(q BrowseQuery) (result *BrowseData, err error) {
 			*mMap[m.ID] = *m
 
 			if _, err := m.UpdateMetadata(tx); err != nil {
-				logger.Errorln(err)
+				logger.Err.Println(err)
 				return nil, err
 			}
 		}
 
 		if err := tx.Commit(); err != nil {
-			logger.Errorln(err)
+			logger.Err.Println(err)
 			return nil, err
 		}
 

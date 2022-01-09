@@ -5,10 +5,9 @@ import (
 	_ "embed"
 	"sync"
 
-	"nonbiri/utils/logger"
-
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/rs1703/logger"
 )
 
 var DB *sqlx.DB
@@ -22,11 +21,11 @@ func Init() {
 		var err error
 		DB, err = sqlx.Open("sqlite3", "nonbiri.db?cache=shared&_journal=WAL")
 		if err != nil {
-			logger.UnexpectedFatal(err)
+			logger.Err.Fatalln(err)
 		}
 
 		if err := DB.Ping(); err != nil {
-			logger.UnexpectedFatal(err)
+			logger.Err.Fatalln(err)
 		}
 		DB.MustExec(string(schema))
 	})

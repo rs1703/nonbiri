@@ -14,13 +14,13 @@ import (
 	"time"
 
 	"nonbiri/utils"
-	"nonbiri/utils/logger"
 
 	. "nonbiri/constants"
 	"nonbiri/websocket"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/handlers"
+	"github.com/rs1703/logger"
 )
 
 type FileTransport struct {
@@ -52,7 +52,7 @@ func StartServer() {
 		ReadTimeout:  60 * time.Second,
 	}
 	if err := Instance.ListenAndServe(); err != nil {
-		logger.UnexpectedFatal(err)
+		logger.Err.Fatalln(err)
 	}
 }
 

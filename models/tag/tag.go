@@ -5,9 +5,10 @@ import (
 
 	. "nonbiri/constants"
 	. "nonbiri/database"
-	"nonbiri/utils/logger"
 
 	"nonbiri/models/entity"
+
+	"github.com/rs1703/logger"
 )
 
 type Tag entity.Entity
@@ -15,7 +16,7 @@ type Slice entity.Slice
 
 func All() (result Slice) {
 	if err := DB.Select(&result, "SELECT * FROM tag"); err != nil {
-		logger.Unexpected(err)
+		logger.Err.Println(err)
 	}
 	return
 }

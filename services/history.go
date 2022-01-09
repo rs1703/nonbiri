@@ -2,18 +2,20 @@ package services
 
 import (
 	. "nonbiri/constants"
-	"nonbiri/utils"
 
 	"nonbiri/models/history"
+
+	"github.com/rs1703/logger"
 )
 
 func History() history.Slice {
-	defer utils.Track("services.GetHistory")()
+	defer logger.Track()()
+
 	return history.All(1000)
 }
 
 func ReadPage(id string, page uint16) (_ *history.History, err error) {
-	defer utils.Track("services.ReadPage")()
+	defer logger.Track()()
 
 	h, err := history.ByChapter(id)
 	if err != nil {
@@ -70,11 +72,13 @@ func setReadState(state bool, ids ...string) (_ history.Slice, err error) {
 }
 
 func ReadChapter(ids ...string) (history.Slice, error) {
-	defer utils.Track("services.ReadChapter")()
+	defer logger.Track()()
+
 	return setReadState(true, ids...)
 }
 
 func UnreadChapter(ids ...string) (history.Slice, error) {
-	defer utils.Track("services.UnreadChapter")()
+	defer logger.Track()()
+
 	return setReadState(false, ids...)
 }

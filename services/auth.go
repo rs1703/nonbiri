@@ -4,11 +4,12 @@ import (
 	"nonbiri/models/manga"
 	"nonbiri/prefs"
 	"nonbiri/scrapers/mangadex"
-	"nonbiri/utils"
+
+	"github.com/rs1703/logger"
 )
 
 func Login(o mangadex.Authorization) (_ bool, err error) {
-	defer utils.Track("services.Login")()
+	defer logger.Track()()
 
 	token, err := mangadex.Login(o)
 	if err != nil {
@@ -23,7 +24,7 @@ func Login(o mangadex.Authorization) (_ bool, err error) {
 }
 
 func RefreshToken() (_ bool, err error) {
-	defer utils.Track("services.RefreshToken")()
+	defer logger.Track()()
 
 	token, err := mangadex.RefreshToken(prefs.Auth.RefreshToken)
 	if err != nil {
@@ -38,12 +39,13 @@ func RefreshToken() (_ bool, err error) {
 }
 
 func CheckToken() (bool, error) {
-	defer utils.Track("services.CheckToken")()
+	defer logger.Track()()
+
 	return mangadex.CheckToken(prefs.Auth.SessionToken)
 }
 
 func GetFollows() (manga.Slice, error) {
-	defer utils.Track("services.GetFollows")()
+	defer logger.Track()()
 
 	token := &mangadex.Token{
 		Session: prefs.Auth.SessionToken,

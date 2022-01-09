@@ -9,7 +9,8 @@ import (
 	"nonbiri/services"
 
 	"nonbiri/scrapers/mangadex"
-	"nonbiri/utils/logger"
+
+	"github.com/rs1703/logger"
 )
 
 var Build string
@@ -20,6 +21,8 @@ func init() {
 	modePtr := flag.String("mode", "release", "")
 	flag.Parse()
 	Mode = *modePtr
+
+	logger.SetOutput("nonbiri.log")
 }
 
 func main() {
@@ -28,12 +31,12 @@ func main() {
 	// Retrieves tags from mangadex
 	tags, err := mangadex.TagsEx()
 	if err != nil {
-		logger.Unexpected(err)
+		logger.Err.Fatalln(err)
 	}
 
 	for _, tag := range tags {
 		if _, err := tag.Save(); err != nil {
-			logger.Unexpected(err)
+			logger.Err.Fatalln(err)
 		}
 	}
 
