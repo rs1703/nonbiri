@@ -24,7 +24,7 @@ func GetManga(id string) (*manga.Manga, error) {
 	return data, nil
 }
 
-func UpdateManga(id string, isUpdating bool) (_ *manga.Manga, err error) {
+func UpdateManga(id string, isUpdating bool) (*manga.Manga, error) {
 	defer logger.Track()()
 
 	data, err := manga.One(id, false)
@@ -32,31 +32,31 @@ func UpdateManga(id string, isUpdating bool) (_ *manga.Manga, err error) {
 		if err == ErrMangaNotFound {
 			data = &manga.Manga{ID: id}
 		} else {
-			return
+			return nil, err
 		}
 	}
 
 	newData, err := mangadex.GetMangaEx(id)
 	if err != nil {
-		return
+		return nil, err
 	}
 	data.Metadata = newData.Metadata
 
 	if len(data.Banner) <= 1 && len(data.Links.AniList) > 0 {
 		data.Banner, err = anilist.GetBanner(data.Links.AniList)
 		if err != nil {
-			return
+			return nil, err
 		}
 	}
 
 	_, err = data.UpdateMetadata(nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	data.Chapters, err = UpdateChapters(data.ID, isUpdating)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if len(data.Chapters) > 0 {
@@ -68,12 +68,12 @@ func UpdateManga(id string, isUpdating bool) (_ *manga.Manga, err error) {
 	return data, nil
 }
 
-func FollowManga(id string, followState FollowState) (_ *manga.Manga, err error) {
+func FollowManga(id string, followState FollowState) (*manga.Manga, error) {
 	defer logger.Track()()
 
 	data, err := manga.One(id, true)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	data.Followed = true
@@ -83,7 +83,7 @@ func FollowManga(id string, followState FollowState) (_ *manga.Manga, err error)
 	}
 
 	if _, err = data.UpdateFollowState(nil); err != nil {
-		return
+		return nil, err
 	}
 
 	cacheLibrary(false)
@@ -91,12 +91,12 @@ func FollowManga(id string, followState FollowState) (_ *manga.Manga, err error)
 	return data, nil
 }
 
-func UnfollowManga(id string) (_ *manga.Manga, err error) {
+func UnfollowManga(id string) (*manga.Manga, error) {
 	defer logger.Track()()
 
 	data, err := manga.One(id, true)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	data.Followed = false
@@ -104,7 +104,7 @@ func UnfollowManga(id string) (_ *manga.Manga, err error) {
 	data.FollowedAt = 0
 
 	if _, err = data.UpdateFollowState(nil); err != nil {
-		return
+		return nil, err
 	}
 
 	cacheLibrary(false)

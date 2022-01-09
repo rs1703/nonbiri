@@ -10,11 +10,10 @@ import (
 
 func History() history.Slice {
 	defer logger.Track()()
-
 	return history.All(1000)
 }
 
-func ReadPage(id string, page uint16) (_ *history.History, err error) {
+func ReadPage(id string, page uint16) (*history.History, error) {
 	defer logger.Track()()
 
 	h, err := history.ByChapter(id)
@@ -22,7 +21,7 @@ func ReadPage(id string, page uint16) (_ *history.History, err error) {
 		if err == ErrHistoryNotFound {
 			h = &history.History{ChapterId: id}
 		} else {
-			return
+			return nil, err
 		}
 	}
 
@@ -34,13 +33,13 @@ func ReadPage(id string, page uint16) (_ *history.History, err error) {
 	}
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	return h, nil
 }
 
-func setReadState(state bool, ids ...string) (_ history.Slice, err error) {
+func setReadState(state bool, ids ...string) (history.Slice, error) {
 	histories := history.Slice{}
 
 	for _, id := range ids {
@@ -73,12 +72,10 @@ func setReadState(state bool, ids ...string) (_ history.Slice, err error) {
 
 func ReadChapter(ids ...string) (history.Slice, error) {
 	defer logger.Track()()
-
 	return setReadState(true, ids...)
 }
 
 func UnreadChapter(ids ...string) (history.Slice, error) {
 	defer logger.Track()()
-
 	return setReadState(false, ids...)
 }

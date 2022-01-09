@@ -79,7 +79,7 @@ func UpdateLibrary() *UpdateState {
 
 			entry, err = UpdateManga(entry.ID, true)
 			if err != nil {
-				logger.Err.Println(err)
+				logger.Err.Println(entry.ID, err)
 			}
 			updateState.Progress++
 		}
