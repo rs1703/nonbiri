@@ -8,12 +8,15 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"time"
 
 	. "nonbiri/constants"
 	"nonbiri/utils"
 
 	"nonbiri/models/chapter"
 	"nonbiri/utils/query"
+
+	"golang.org/x/time/rate"
 )
 
 // https://api.mangadex.org/docs.html#operation/get-manga-id-feed
@@ -215,8 +218,10 @@ func SearchChapterEx(q ChapterQuery) ([]*chapter.Chapter, *QueryResultInfo, erro
 	return entries, info, err
 }
 
+var atHomeLimiter = rate.NewLimiter(rate.Every(time.Minute/40), 1) // 40 requests/minute
+
 func GetPages(chapterId string) (*ChapterPagesMetadata, error) {
-	limiter.Wait(context.Background())
+	atHomeLimiter.Wait(context.Background())
 
 	u := path.Join("/at-home/server", chapterId)
 	buf, err := utils.Get(buildURL(u))
