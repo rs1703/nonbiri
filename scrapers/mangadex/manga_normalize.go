@@ -12,9 +12,10 @@ import (
 )
 
 type Localizations struct {
-	EN string
-	JA string
-	JP string
+	EN   string `json:"en"`
+	JA   string `json:"ja"`
+	JAro string `json:"ja-ro"`
+	JP   string `json:"jp"`
 }
 
 func (self *Manga) Normalize() *manga.Manga {
@@ -166,6 +167,8 @@ func parseLocalizations(data any, dst *string) bool {
 					*dst = loc.EN
 				} else if len(loc.JA) > 0 {
 					*dst = loc.JA
+				} else if len(loc.JAro) > 0 {
+					*dst = loc.JAro
 				} else {
 					*dst = loc.JP
 				}
