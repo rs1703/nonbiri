@@ -80,7 +80,6 @@ func UpdateLibrary() *UpdateState {
 			entry, err = UpdateManga(entry.ID, true)
 			if err != nil {
 				logger.Unexpected(err)
-				continue
 			}
 			updateState.Progress++
 		}

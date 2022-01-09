@@ -8,7 +8,15 @@ import utils from "../../utils";
 import { deepClone, formatChapter } from "../../utils/encoding";
 import { useMounted, useMutableHistory, useMutableLocation, useMutableMemo } from "../../utils/hooks";
 import Sync from "../../utils/Sync";
-import websocket, { GetChapters, GetManga, ReadChapter, ReadPage, UpdateChapters, UpdateManga } from "../../websocket";
+import websocket, {
+  GetChapters,
+  GetManga,
+  ReadChapter,
+  ReadPage,
+  UpdateChapter,
+  UpdateChapters,
+  UpdateManga
+} from "../../websocket";
 import NotFound from "../NotFound";
 import Spinner from "../Spinner";
 import Main from "./Main";
@@ -232,9 +240,18 @@ const Reader = () => {
 
         if (!mountedRef.current) return;
         if (!error) setIsLoading(false);
-      } else if (chapterRef.current?.pages?.length) {
-        setIsLoading(false);
-        return;
+      } else if (chapterRef.current) {
+        if (chapterRef.current?.pages?.length && chapterRef.current?.hash) {
+          setIsLoading(false);
+          return;
+        }
+
+        const track = utils.Track("[Reader] Getting pages...");
+        const { error } = await UpdateChapter(chapterRef.current.id);
+        track();
+
+        if (!mountedRef.current) return;
+        if (!error) setIsLoading(false);
       }
 
       if (chapterRef.current?.externalURL) {
@@ -350,21 +367,23 @@ const Reader = () => {
         </Helmet>
       )}
 
-      {dataRef.current ? (
-        <>
-          <Sidebar />
-          <Main key={chapterId} />
-        </>
-      ) : (
-        (() =>
-          isLoading ? (
-            <Spinner styleName="loading" />
-          ) : (
-            <NotFound>
-              <p>Manga does not exists</p>
-            </NotFound>
-          ))()
-      )}
+      <div styleName="reader">
+        {dataRef.current ? (
+          <>
+            <Sidebar />
+            <Main key={chapterId} />
+          </>
+        ) : (
+          (() =>
+            isLoading ? (
+              <Spinner styleName="loading" />
+            ) : (
+              <NotFound>
+                <p>Manga does not exists</p>
+              </NotFound>
+            ))()
+        )}
+      </div>
     </ReaderContext.Provider>
   );
 };

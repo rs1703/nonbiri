@@ -148,17 +148,6 @@ func GetChapters(mangaId string, q FeedQuery) ([]*Chapter, error) {
 			return nil, err
 		}
 
-		for _, entry := range res.Data {
-			if len(entry.Attributes.Hash) == 0 || len(entry.Attributes.Data) == 0 {
-				pagesMetadata, err := GetPages(entry.ID)
-				if err != nil {
-					return nil, err
-				}
-				entry.Attributes.Hash = pagesMetadata.Chapter.Hash
-				entry.Attributes.Data = pagesMetadata.Chapter.Data
-			}
-		}
-
 		entries = append(entries, res.Data...)
 		if res.Offset >= res.Total {
 			break
