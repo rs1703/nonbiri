@@ -39,9 +39,6 @@ func UpdateChapter(id string) (_ *chapter.Chapter, err error) {
 	}
 
 	data.MangaId = newData.MangaId
-	if len(newData.Hash) == 0 {
-		newData.Hash = data.Hash
-	}
 	data.Metadata = newData.Metadata
 	if len(newData.Pages) > 0 {
 		data.Pages = newData.Pages
@@ -80,6 +77,9 @@ func UpdateChapters(mangaId string, isUpdating bool) (_ []*chapter.Chapter, err 
 	cMap := chapters.Map()
 	for _, next := range newChapters {
 		if prev, exists := cMap[next.ID]; exists {
+			if len(next.Hash) == 0 {
+				next.Hash = prev.Hash
+			}
 			prev.Metadata = next.Metadata
 			if len(next.Pages) > 0 {
 				prev.Pages = next.Pages
