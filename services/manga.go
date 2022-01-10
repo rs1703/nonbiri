@@ -43,9 +43,11 @@ func UpdateManga(id string, isUpdating bool) (*manga.Manga, error) {
 	data.Metadata = newData.Metadata
 
 	if len(data.Banner) <= 1 && len(data.Links.AniList) > 0 {
-		data.Banner, err = anilist.GetBanner(data.Links.AniList)
-		if err != nil {
-			return nil, err
+		banner, err := anilist.GetBanner(data.Links.AniList)
+		if err == nil {
+			data.Banner = banner
+		} else {
+			logger.Err.Println(data.ID, err)
 		}
 	}
 
