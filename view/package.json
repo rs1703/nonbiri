@@ -6,7 +6,7 @@
     "dev": "webpack --config webpack.dev.js --watch"
   },
   "dependencies": {
-    "marked": "^3.0.7",
+    "marked": "^4.0.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-headroom": "^3.2.0",
