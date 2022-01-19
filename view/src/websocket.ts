@@ -127,6 +127,8 @@ export const ReadChapter = (...chapterIds: string[]) =>
 export const UnreadChapter = (...chapterIds: string[]) =>
   SendMessage<ReadState[]>(Task.UnreadChapter, chapterIds.length > 1 ? { chapterIds } : { chapterId: chapterIds[0] });
 
+export const GetPages = (chapterId: string) => SendMessage<Chapter>(Task.GetPages, chapterId);
+
 //
 
 export const GetLibrary = () => SendMessage<Manga[]>(Task.Library);

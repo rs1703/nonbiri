@@ -16,6 +16,7 @@ var Tasks = struct {
 	ReadPage,
 	ReadChapter,
 	UnreadChapter,
+	GetPages,
 
 	Library,
 	Browse,
@@ -49,6 +50,7 @@ var Tasks = struct {
 	ReadPage:      9,
 	ReadChapter:   10,
 	UnreadChapter: 11,
+	GetPages:      12,
 
 	Library: 30,
 	Browse:  31,

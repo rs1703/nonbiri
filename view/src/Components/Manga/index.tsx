@@ -1,4 +1,4 @@
-import marked from "marked";
+import { marked } from "marked";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useRouteMatch } from "react-router";

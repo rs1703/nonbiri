@@ -101,3 +101,36 @@ func UpdateChapters(mangaId string, isUpdating bool) ([]*chapter.Chapter, error)
 	cacheUpdates(isUpdating)
 	return chapters, nil
 }
+
+func GetPages(id string) (*chapter.Chapter, error) {
+	defer logger.Track()()
+
+	data, err := chapter.One(id)
+	if err != nil {
+		return nil, err
+	}
+
+	pages, err := mangadex.GetPages(id)
+	if err != nil {
+		return nil, err
+	}
+
+	inc := 0
+	if len(pages.Chapter.Data) > 0 {
+		data.Pages = pages.Chapter.Data
+		inc++
+	}
+	if len(pages.Chapter.Hash) > 0 {
+		data.Hash = pages.Chapter.Hash
+		inc++
+	}
+
+	if inc > 0 {
+		if _, err = data.UpdateMetadata(nil); err != nil {
+			return nil, err
+		}
+		cacheLibrary(false)
+		cacheUpdates(false)
+	}
+	return data, nil
+}

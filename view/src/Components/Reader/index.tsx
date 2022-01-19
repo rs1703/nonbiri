@@ -11,9 +11,9 @@ import Sync from "../../utils/Sync";
 import websocket, {
   GetChapters,
   GetManga,
+  GetPages,
   ReadChapter,
   ReadPage,
-  UpdateChapter,
   UpdateChapters,
   UpdateManga
 } from "../../websocket";
@@ -219,6 +219,7 @@ const Reader = () => {
       websocket.Handle(Task.UpdateChapter, updateChapter),
       websocket.Handle(Task.GetChapters, updateChapters),
       websocket.Handle(Task.UpdateChapters, updateChapters),
+      websocket.Handle(Task.GetPages, updateChapter),
 
       websocket.Handle(Task.ReadPage, updateHistory),
       websocket.Handle(Task.ReadChapter, updateHistories),
@@ -247,7 +248,7 @@ const Reader = () => {
         }
 
         const track = utils.Track("[Reader] Getting pages...");
-        const { error } = await UpdateChapter(chapterRef.current.id);
+        const { error } = await GetPages(chapterRef.current.id);
         track();
 
         if (!mountedRef.current) return;
@@ -261,7 +262,7 @@ const Reader = () => {
 
       setIsUpdating(true);
 
-      const track = utils.Track("[Reader] Retrieving latest metadata and chapters...");
+      let track = utils.Track("[Reader] Retrieving latest metadata and chapters...");
       let error: string;
 
       if (!dataRef.current) {
@@ -273,7 +274,16 @@ const Reader = () => {
       track();
 
       if (!mountedRef.current) return;
-      if (error) console.error(error);
+      if (error) {
+        console.error(error);
+      } else if (chapterRef.current && !chapterRef.current.pages?.length) {
+        track = utils.Track("[Reader] Getting pages...");
+        ({ error } = await GetPages(chapterRef.current.id));
+        track();
+
+        if (!mountedRef.current) return;
+        if (error) console.error(error);
+      }
 
       setIsLoading(false);
       setIsUpdating(false);
