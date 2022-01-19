@@ -20,3 +20,7 @@ func GetChapters(message *websocket.IncomingMessage) (any, error) {
 func UpdateChapters(message *websocket.IncomingMessage) (any, error) {
 	return services.UpdateChapters(message.Body.(string), false)
 }
+
+func GetPages(message *websocket.IncomingMessage) (any, error) {
+	return services.GetPages(message.Body.(string))
+}

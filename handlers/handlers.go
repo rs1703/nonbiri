@@ -29,6 +29,7 @@ func init() {
 	websocket.Handle(Tasks.ReadPage, ReadPage)
 	websocket.Handle(Tasks.ReadChapter, ReadChapter)
 	websocket.Handle(Tasks.UnreadChapter, UnreadChapter)
+	websocket.Handle(Tasks.GetPages, GetPages)
 
 	websocket.Handle(Tasks.Library, Library)
 	websocket.Handle(Tasks.Browse, Browse)

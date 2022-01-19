@@ -103,6 +103,7 @@ export enum Task {
   ReadPage,
   ReadChapter,
   UnreadChapter,
+  GetPages,
 
   Library = 30,
   Browse,
