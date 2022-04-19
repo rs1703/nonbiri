@@ -25,7 +25,12 @@ const Init = (): Promise<void> => {
       }
     };
 
-    instance = new WebSocket(`ws://${window.location.host}/ws`);
+    let protocol = "ws:";
+    if (window.location.protocol === "https:") {
+      protocol = "wss:";
+    }
+
+    instance = new WebSocket(`${protocol}//${window.location.host}/ws`);
     identifier = 1;
 
     instance.addEventListener("open", () => {
