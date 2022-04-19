@@ -1,5 +1,5 @@
-BINARY_NAME := nonbiri
-BINARY_DIRECTORY := bin
+BINARY_NAME=nonbiri
+BINARY_DIRECTORY=bin
 
 VERSION=$(shell cat version.txt)
 BUILD=$(shell git rev-parse HEAD)
