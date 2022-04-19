@@ -4,7 +4,7 @@ BINARY_DIRECTORY=bin
 VERSION=$(shell cat version.txt)
 BUILD=$(shell git rev-parse HEAD)
 
-PLATFORMS=darwin linux windows
+PLATFORMS=darwin linux
 ARCHITECTURES=386 amd64
 LDFLAGS=-ldflags="-s -w -X 'main.Version=${VERSION}' -X 'main.Build=${BUILD}'"
 
@@ -15,8 +15,8 @@ all: test build build-view
 build:
 	$(foreach GOOS,$(PLATFORMS),\
 		$(foreach GOARCH,$(ARCHITECTURES),\
-			$(shell $(if $(filter Windows_NT,$(OS)),set,export) GOOS=$(GOOS) GOARCH=$(GOARCH))\
-			$(shell go build $(LDFLAGS) -o $(BINARY_DIRECTORY)/$(BINARY_NAME)_$(GOOS)-$(GOARCH)$(if $(filter windows,$(GOOS)),.exe))\
+			$(shell export GOOS=$(GOOS) GOARCH=$(GOARCH))\
+			$(shell go build $(LDFLAGS) -o $(BINARY_DIRECTORY)/$(BINARY_NAME)_$(GOOS)-$(GOARCH))\
 		)\
 	)
 
