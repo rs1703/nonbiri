@@ -4,9 +4,7 @@ _The UI is inspired by [Tachiyomi](https://github.com/tachiyomiorg/tachiyomi) (P
 
 # Nonbiri
 
-Nonbiri is a self-hosted back-end and front-end for MangaDex.
-
-For now this project is just something that I made for myself on my spare time, mainly because I want to read manga on my desktop without having to deal with MangaDex's clunky UI, while also want something like Tachiyomi but on browser. So feel free to contribute or fork your own.
+Nonbiri is a self-hosted back-end and front-end for MangaDex. Just something I made for myself because MangaDex's new UI is bloated piece of hot garbage. The back-end itself is lightweight because of Go's garbage collector (< 100MB).
 
 ![Memory usage](https://raw.githubusercontent.com/rs1703/nonbiri/gh-pages/2.png)
 
@@ -23,7 +21,7 @@ Library and history are stored locally, Nonbiri will not push follows and readin
 
 ## Installation
 
-~~Pre-built binaries are available on [releases page](#).~~
+Pre-built binaries are available on [releases page](https://github.com/rs1703/nonbiri/releases).
 
 ### Usage
 
