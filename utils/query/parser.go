@@ -155,7 +155,7 @@ func getDefault(f *reflect.StructField) *reflector.Tag {
 }
 
 func getMin(f *reflect.StructField) int {
-	n := math.MaxInt
+	n := math.MinInt64
 	if value := f.Tag.Get("min"); len(value) > 0 {
 		n, _ = strconv.Atoi(value)
 	}
@@ -163,7 +163,7 @@ func getMin(f *reflect.StructField) int {
 }
 
 func getMax(f *reflect.StructField) int {
-	n := math.MaxInt
+	n := math.MaxInt64
 	if value := f.Tag.Get("max"); len(value) > 0 {
 		n, _ = strconv.Atoi(value)
 	}
