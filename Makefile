@@ -1,12 +1,9 @@
 BINARY_NAME=nonbiri
 BINARY_DIRECTORY=bin
 
-VERSION=$(shell cat version.txt)
-BUILD=$(shell git rev-parse HEAD)
-
 PLATFORMS=darwin linux
 ARCHITECTURES=386 amd64
-LDFLAGS=-ldflags="-s -w -X 'main.Version=${VERSION}' -X 'main.Build=${BUILD}'"
+LDFLAGS=-ldflags="-s -w"
 
 default: build
 
